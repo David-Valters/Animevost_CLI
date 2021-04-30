@@ -1,8 +1,12 @@
 # animevost_console_program
-Libraries:
+# Libraries:
+
 pip install requests
+
 pip install BeautifulSoup4
+
 pip install clint
 
-start:
+# start:
+
   python main.py
