@@ -1,20 +1,19 @@
 import requests
 import os
 from clint.textui import progress
-#v.1.0
-#def save_from(url,name_file):
+#v.1.1
+lb=r'<>:"/\|?*'
+
+
 def save_from(listt,name):
+
+	name  =name.replace('\n', '')
+	for i in lb:
+		if(name.find(i)!=-1):
+			name=name.replace(i, '')
 	if not(os.path.isdir(name)):
 		os.mkdir(name)
 	print(name+'|')
-	# r = requests.get(url,allow_redirects=True)
-	# if r.status_code!=200:
-	# 	print("Error conect to player: "+str(r.status_code))
-	# 	return None
-	# #print("Start write "+str(name_file))
-	# with open(name_file,'wb') as f:
-	# 	f.write(r.content)
-	# print("End write "+str(name_file))
 	for l in listt:
 		url=l[1]
 		name_file=l[0]
@@ -33,7 +32,6 @@ def save_from(listt,name):
 
 def main():
 	url=[['1 серія','https://hd.trn.su/720/2147418055.mp4?md5=cKZR2TSd6M1bGl9E6cXxQA&time=1617988234&d=1']]
-	#url='https://static.ukrinform.com/photos/2020_03/thumb_files/630_360_1583495014-314.png'
 	save_from(url,'defaul')
 
 if __name__ == '__main__':
