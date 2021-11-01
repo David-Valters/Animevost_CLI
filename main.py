@@ -6,7 +6,6 @@ import requests # відправка запитів дял отримання к
 from bs4 import BeautifulSoup # парсинг сторіки
 import inst #мій модуль для завантаження
 import traceback  #інформація про помилки
-import os #системні команди типу читання і запису
 import re # регулярки
 
 
@@ -60,7 +59,6 @@ class taytl_base:
     
 
 
-
 class taytl(taytl_base):
     def giv_kl_ep(self):
         return self.kl_ep
@@ -94,7 +92,7 @@ class taytl(taytl_base):
         
     def __init__(self, url, name=None,kl_ep=0,list_ep=None,list_dop_ep=None,soup=None):
         super().__init__(url,name)
-        r= requests.get(url)
+        r = requests.get(url)
         if r.status_code!=200:
             print("Error conect to site(information about the series): "+str(r.status_code))
         soup=BeautifulSoup(r.content, 'html.parser')
@@ -194,7 +192,7 @@ def choice_episod(taytl_var: taytl):
         number_last_ep=taytl_var.kl_ep-taytl_var.kl_dop_ep
 
     while True:
-        v=input(f"1-Вибрати декілька серій 2-вибрати останню серію - {number_last_ep} 3-вибрати все ({taytl_var.kl_ep}) 0-Головне Меню > ")
+        v=input(f"[1]-Вибрати декілька серій [2]-вибрати останню серію - {number_last_ep} [3]-вибрати все ({taytl_var.kl_ep}) [0]-Головне Меню > ")
         try:
             v=int(v)
         except ValueError:
@@ -210,9 +208,9 @@ def choice_episod(taytl_var: taytl):
                     spesh_info=f" {taytl_var.kl_ep-taytl_var.kl_dop_ep+1}-{taytl_var.kl_ep} спешли "
             else:
                 spesh_info=""
-            print(f"З якої серії начати скачування(1-{taytl_var.kl_ep}){spesh_info}? ")
+            print(f"З якої серії почати завантажування(1-{taytl_var.kl_ep}){spesh_info}? ")
             start=input_num(1,taytl_var.kl_ep)
-            print(f"По яку серію скачувати({start}-{taytl_var.kl_ep}){spesh_info}? ")
+            print(f"По яку серію завантажувати({start}-{taytl_var.kl_ep}){spesh_info}? ")
             end=input_num(start,taytl_var.kl_ep)
             v_yakist=quesBool("Завантажувати серії в якості 720? інакше 480")
             if v_yakist:
@@ -248,6 +246,7 @@ def choice_episod(taytl_var: taytl):
 
 def download(taytl_var: taytl):
     list_down=choice_episod(taytl_var)
+    print(list_down)# 
     name_tt=taytl_var.name[:taytl_var.name.find('/')][:-1]
     inst.save_from(list_down,name_tt)
 
@@ -257,7 +256,7 @@ def main():
    
     #-- 
     while 1:
-        print('\n\n1-Останні тайтли на сайті 2-Посилання на тайтл 3-Пошук 4-Ваші нові серії 5-Налаштування 0-Вийти > ')
+        print('\n\n[1]-Останні тайтли на сайті [2]-Посилання на тайтл [3]-Пошук [4]-Ваші нові серії [5]-Налаштування [0]-Вийти > ')
         v=input_num(0,5)
         if v==1:
             list=giv_end_list_taytls()  
@@ -274,6 +273,7 @@ def main():
                         if taytl_buf.giv_kl_ep()==0:
                             print('Це Анонс,серій ще немає')
                             flag=False
+                            continue
                         taytl_var = taytl(taytl_buf.url,taytl_buf.name)
                         flag=False
                         download(taytl_var)
