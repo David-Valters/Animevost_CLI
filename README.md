@@ -5,8 +5,6 @@ pip install requests
 
 pip install BeautifulSoup4
 
-pip install clint
-
-# start:
+# Start:
 
   python main.py
