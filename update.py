@@ -4,7 +4,7 @@ import sys
 
 import libery
 
-ver='v1.0.1'
+ver='v1.0.0'
 url_ver='https://api.github.com/repos/David-Valters/Animevost_CLI/releases'
 url_file_list='https://api.github.com/repos/David-Valters/Animevost_CLI/git/trees/main?recursive=1'
 
@@ -44,12 +44,12 @@ if __name__ == '__main__':
     stan=isactual()
     if stan:
         print('Програма актуальна')
-        v=libery.quesBool('Обновити файли (закрийте перед оновленням основну програму)?',0)
+        v=libery.quesBool('Обновити файли ?',0)
         if v:
             update()
     else:
         print('Доступне оновлення !!!')
-        v=libery.quesBool('Оновити (закрийте перед оновленням основну програму)?')
+        v=libery.quesBool('Оновити ?')
         if v:           
             update()
             
