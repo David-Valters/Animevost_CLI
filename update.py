@@ -40,23 +40,16 @@ def update(prin=1):
     if prin:
         print('Файли програми оновлені')
 
-if __name__ == '__main__':
-    if len(sys.argv)>1:
-        print('тиха')
-        update()
-        from subprocess import Popen
-        Popen(['python',os.path.join(libery.get_script_dir(),'main.py'),'arg2'], shell=True)
-        exit()
-    else:   
-        stan=isactual()
-        if stan:
-            print('Програма актуальна')
-            v=libery.quesBool('Обновити файли (закрийте перед оновленням основну програму)?',0)
-            if v:
-                update()
-        else:
-            print('Доступне оновлення !!!')
-            v=libery.quesBool('Оновити (закрийте перед оновленням основну програму)?')
-            if v:           
-                update()
+if __name__ == '__main__': 
+    stan=isactual()
+    if stan:
+        print('Програма актуальна')
+        v=libery.quesBool('Обновити файли (закрийте перед оновленням основну програму)?',0)
+        if v:
+            update()
+    else:
+        print('Доступне оновлення !!!')
+        v=libery.quesBool('Оновити (закрийте перед оновленням основну програму)?')
+        if v:           
+            update()
             
