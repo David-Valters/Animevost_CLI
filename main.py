@@ -1,24 +1,14 @@
 print('start program')
 #cls; python main.py
-#clear ; python ./main.py 
-print('start import libery')
+ #clear ; python ./main.py 
 from sys import flags 
 import requests # відправка запитів дял отримання коу веб сторінки
 from bs4 import BeautifulSoup # парсинг сторіки
 import inst #мій модуль для завантаження
+import libery #мій модуль з додатковивми фунуціями
 import traceback  #інформація про помилки
-import os #системні команди типу читання і запису
 import re # регулярки
 import update
-import sys
-
-import libery
-
-print('end import libery')
-
-update.isactual()
-
-
 
  
 def input_num(min:int,max:int)->int:
@@ -35,22 +25,6 @@ def input_num(min:int,max:int)->int:
             print('Введіть число ')  
             continue
         return v
-
-def quesBool(text,priority=1):
-    if priority:
-        yesorno=' [Д/н]'
-    else:
-        yesorno=' [д/Н]'		
-
-    inp=input(text+yesorno)
-
-    if inp=='':
-        return priority
-    
-    if inp=='Y'  or inp=='y' or inp=='Д' or inp=='д' or inp=='Т' or inp=='т' or inp=='yes' or inp=='Yes' :
-        return True
-    else:
-        return False
 class taytl_base:
     def __init__(self,url,name=""):
         self.name=name
@@ -68,7 +42,6 @@ class taytl_base:
         i2=name.find(' ',i1)
         return int(name[i1+1:i2])
     
-
 
 
 class taytl(taytl_base):
@@ -103,8 +76,10 @@ class taytl(taytl_base):
         
         
     def __init__(self, url, name=None,kl_ep=0,list_ep=None,list_dop_ep=None,soup=None):
+        def init_all_taytl(self):
+            self.all_taytl=None
         super().__init__(url,name)
-        r= requests.get(url)
+        r = requests.get(url)
         if r.status_code!=200:
             print("Error conect to site(information about the series): "+str(r.status_code))
         soup=BeautifulSoup(r.content, 'html.parser')
@@ -115,7 +90,7 @@ class taytl(taytl_base):
             self.list_dop_ep=None
         if kl_ep==0:
             self.kl_ep=0
-
+        
         # file = open('sorc_site.txt',mode='r', encoding='utf-8')
         # cont = file.read()
         # file.close()
@@ -128,18 +103,10 @@ class taytl(taytl_base):
             name=name[1:]
         self.name=name
         self.kl_ep=super().giv_kl_ep()
-        
+        # self.all_taytl=init_all_taytl()
 
-        
-        
-        
-    
-
-
-
-def giv_end_taytls():# вертає html з даними про остані тайтли
-    
-    r= requests.get(main_url)
+def giv_end_taytls(url):# вертає html з даними про остані тайтли  
+    r= requests.get(url)
     if r.status_code!=200:
         print("Error conect to site(list taytl): "+str(r.status_code))
         return None
@@ -158,8 +125,8 @@ def print_list(list,min=0,max=None):
             break
 
 
-def giv_end_list_taytls():#вертає список обєктів taytl
-    el=giv_end_taytls()
+def giv_end_list_taytls(url):#вертає список обєктів taytl
+    el=giv_end_taytls(url)
     s=[]
     for i in el:
         s.append(taytl_base(i['href'],i.text))
@@ -204,7 +171,7 @@ def choice_episod(taytl_var: taytl):
         number_last_ep=taytl_var.kl_ep-taytl_var.kl_dop_ep
 
     while True:
-        v=input(f"1-Вибрати декілька серій 2-вибрати останню серію - {number_last_ep} 3-вибрати все ({taytl_var.kl_ep}) 0-Головне Меню > ")
+        v=input(f"[1]-Вибрати декілька серій [2]-вибрати останню серію - ({number_last_ep}) [3]-вибрати все ({taytl_var.kl_ep}) [0]-Головне Меню > ")
         try:
             v=int(v)
         except ValueError:
@@ -220,11 +187,11 @@ def choice_episod(taytl_var: taytl):
                     spesh_info=f" {taytl_var.kl_ep-taytl_var.kl_dop_ep+1}-{taytl_var.kl_ep} спешли "
             else:
                 spesh_info=""
-            print(f"З якої серії начати скачування(1-{taytl_var.kl_ep}){spesh_info}? ")
+            print(f"З якої серії почати завантажування(1-{taytl_var.kl_ep}){spesh_info}? ")
             start=input_num(1,taytl_var.kl_ep)
-            print(f"По яку серію скачувати({start}-{taytl_var.kl_ep}){spesh_info}? ")
+            print(f"По яку серію завантажувати({start}-{taytl_var.kl_ep}){spesh_info}? ")
             end=input_num(start,taytl_var.kl_ep)
-            v_yakist=quesBool("Завантажувати серії в якості 720? інакше 480")
+            v_yakist=libery.quesBool("Завантажувати серії в якості 720? інакше 480")
             if v_yakist:
                 yak=720
             else:
@@ -238,14 +205,14 @@ def choice_episod(taytl_var: taytl):
                 ep=taytl_var.list_dop_ep[-1]
             else:
                 ep=taytl_var.list_ep[-1]
-            v_yakist=quesBool("Завантажувати серію в якості 720? інакше 480")
+            v_yakist=libery.quesBool("Завантажувати серію в якості 720? інакше 480")
             if v_yakist:
                 dow_url=make_ep_url(ep[1],720)
             else:
                 dow_url=make_ep_url(ep[1],480)
             return [[ep[0],dow_url]]   
         elif v==3:
-            v_yakist=quesBool("Завантажувати серії в якості 720? інакше 480")
+            v_yakist=libery.quesBool("Завантажувати серії в якості 720? інакше 480")
             if v_yakist:
                 yak=720
             else:
@@ -258,6 +225,7 @@ def choice_episod(taytl_var: taytl):
 
 def download(taytl_var: taytl):
     list_down=choice_episod(taytl_var)
+    # print(list_down)# 
     name_tt=taytl_var.name[:taytl_var.name.find('/')][:-1]
     inst.save_from(list_down,name_tt)
 
@@ -267,10 +235,10 @@ def main():
    
     #-- 
     while 1:
-        print('\n\n1-Останні тайтли на сайті 2-Посилання на тайтл 3-Пошук 4-Ваші нові серії 5-Налаштування 0-Вийти > ')
+        print('\n\n[1]-Останні тайтли на сайті [2]-Посилання на тайтл [3]-Пошук [4]-Ваші нові серії [5]-Налаштування [0]-Вийти > ')
         v=input_num(0,5)
         if v==1:
-            list=giv_end_list_taytls()  
+            list=giv_end_list_taytls(main_url)  
             print_list(list,max=k_ser)  
             flag=True       
             while flag:
@@ -284,6 +252,7 @@ def main():
                         if taytl_buf.giv_kl_ep()==0:
                             print('Це Анонс,серій ще немає')
                             flag=False
+                            continue
                         taytl_var = taytl(taytl_buf.url,taytl_buf.name)
                         flag=False
                         download(taytl_var)
@@ -310,6 +279,7 @@ def main():
     
 if __name__ == '__main__':
     try:
+        
         global main_url
         main_url='http://animevost.org'
         global nom_player
@@ -339,3 +309,4 @@ if __name__ == '__main__':
         
     except KeyboardInterrupt:
         print("\nХтось закрив програму")
+

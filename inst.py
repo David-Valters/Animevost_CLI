@@ -2,8 +2,6 @@ import requests
 import os
 import sys
 import math
-#from clint.textui import progress
-#v.1.1
 lb=r'<>:"/\|?*'
 
 def convert_size(size_bytes,write_type=1):
@@ -23,7 +21,7 @@ def down(file_name,path,url):
 	with open(path, "wb") as f:
 		response = requests.get(url, stream=True)
 		if response.status_code!=200:
-				print("Error conect to player: "+str(r.status_code))
+				print("Error conect to player: "+str(response.status_code))
 				return None
 		print("Downloading %s" % file_name)
 		total_length = response.headers.get('content-length')
@@ -65,13 +63,6 @@ def save_from(listt,name,path=""):
 		#print("Start write "+str(name_file))
 		path_name=os.path.join(path,name_file+".mp4")
 		down(name_file,path_name,url)		
-		# with open(path_name, 'wb') as f:
-		#     total_length = int(r.headers.get('content-length'))
-		#     for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
-		#         if chunk:
-		#             f.write(chunk)
-		#             f.flush()
-		# print("End write "+str(name_file))
 
 def main():
 	url=[['1 серія','https://hd.trn.su/720/2147418055.mp4?md5=cKZR2TSd6M1bGl9E6cXxQA&time=1617988234&d=1']]
