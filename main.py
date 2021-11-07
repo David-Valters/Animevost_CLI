@@ -310,10 +310,6 @@ def main():
     
 if __name__ == '__main__':
     try:
-        if len(sys.argv)>1:
-            print('Restart')
-            os.execv(sys.executable, [sys.executable] + sys.argv[0])
-        #--- global var
         global main_url
         main_url='http://animevost.org'
         global nom_player
@@ -324,12 +320,9 @@ if __name__ == '__main__':
             print('\nДоступне оновлення !!!!\n')
             v=libery.quesBool('Оновити ?')
             if v:
-                print('Початок оновлення')
-                from subprocess import Popen
-                Popen(['python',os.path.join(libery.get_script_dir(),'update.py'),'arg2'], shell=True)
-                exit()
-                # update.update()
-                # os.execv(sys.executable, [sys.executable] + sys.argv)
+                print('Початок оновлення')                
+                update.update()
+                os.execv(sys.executable, [sys.executable] + sys.argv)
         main()
     except requests.ConnectionError as e:
         print("OOPS!! Помилка з'єднання. Переконайтеся, що ви підключені до Інтернету.\n")
