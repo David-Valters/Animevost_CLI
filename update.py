@@ -4,7 +4,7 @@ import sys
 
 import libery
 
-ver='v1.0.0'
+ver='v1.0.1'
 url_ver='https://api.github.com/repos/David-Valters/Animevost_CLI/releases'
 url_file_list='https://api.github.com/repos/David-Valters/Animevost_CLI/git/trees/main?recursive=1'
 
