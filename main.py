@@ -322,7 +322,8 @@ if __name__ == '__main__':
             if v:
                 print('Початок оновлення')                
                 update.update()
-                os.execv(sys.executable, [sys.executable] + sys.argv)
+                print('\nПрограму оновлено, запустіть її щераз')
+                exit()
         main()
     except requests.ConnectionError as e:
         print("OOPS!! Помилка з'єднання. Переконайтеся, що ви підключені до Інтернету.\n")
