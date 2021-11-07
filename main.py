@@ -1,6 +1,7 @@
 print('start program')
 #cls; python main.py
 #clear ; python ./main.py 
+print('start import libery')
 from sys import flags 
 import requests # відправка запитів дял отримання коу веб сторінки
 from bs4 import BeautifulSoup # парсинг сторіки
@@ -8,6 +9,15 @@ import inst #мій модуль для завантаження
 import traceback  #інформація про помилки
 import os #системні команди типу читання і запису
 import re # регулярки
+import update
+import sys
+
+import libery
+
+print('end import libery')
+
+update.isactual()
+
 
 
  
@@ -306,6 +316,17 @@ if __name__ == '__main__':
         global nom_player
         nom_payer=0
         #---
+        stan=0#update.isactual()
+        if not stan:
+            print('\nДоступне оновлення !!!!\n')
+            v=libery.quesBool('Оновити ?')
+            if v:
+                print('Початок оновлення')
+                from subprocess import Popen
+                Popen(['python',os.path.join(libery.get_script_dir(),'update.py'),'arg2'], shell=True)
+                exit()
+                # update.update()
+                # os.execv(sys.executable, [sys.executable] + sys.argv)
         main()
     except requests.ConnectionError as e:
         print("OOPS!! Помилка з'єднання. Переконайтеся, що ви підключені до Інтернету.\n")
