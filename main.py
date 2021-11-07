@@ -310,13 +310,16 @@ def main():
     
 if __name__ == '__main__':
     try:
+        if len(sys.argv)>1:
+            print('Restart')
+            os.execv(sys.executable, [sys.executable])
         #--- global var
         global main_url
         main_url='http://animevost.org'
         global nom_player
         nom_payer=0
         #---
-        stan=0#update.isactual()
+        stan=update.isactual()
         if not stan:
             print('\nДоступне оновлення !!!!\n')
             v=libery.quesBool('Оновити ?')
