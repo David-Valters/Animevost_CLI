@@ -312,7 +312,7 @@ if __name__ == '__main__':
     try:
         if len(sys.argv)>1:
             print('Restart')
-            os.execv(sys.executable, [sys.executable])
+            os.execv(sys.executable, [sys.executable] + sys.argv[0])
         #--- global var
         global main_url
         main_url='http://animevost.org'
