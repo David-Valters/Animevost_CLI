@@ -1,9 +1,7 @@
 # animevost_console_program
 # Libraries:
 
-pip install requests
-
-pip install BeautifulSoup4
+python -m pip install -r requirements.txt
 
 # Start:
 
