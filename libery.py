@@ -89,6 +89,7 @@ class taytl(taytl_base):
         
         self.soup=soup
         items = soup.find('h1')
+        # print(url)
         name=items.text
         while name[0]==' ' or name[0]=='\n' :
             name=name[1:]
@@ -130,8 +131,10 @@ def parse_results(response):#search def
             'title': result.find(css_identifier_title, first=True).text,
             'link': result.find(css_identifier_link, first=True).attrs['href'],
         }
-        
-        output.append(item)
+        if(len(output)<3):
+            output.append(item)
+        else:
+            break
         
     return output
 
@@ -147,7 +150,7 @@ def get_script_dir(follow_symlinks=True):
     if follow_symlinks:
         path = os.path.realpath(path)
     return os.path.dirname(path)
-def print_list(list,min=0,max=None):
+def print_taytl(list,min=0,max=None):
     print()
     if max==None:
         max=len(list)
@@ -157,6 +160,7 @@ def print_list(list,min=0,max=None):
         else:
             break
     print()
+
 def quesBool(text,priority=1):
     if priority:
         yesorno=' [Д/н]'
@@ -174,12 +178,16 @@ def quesBool(text,priority=1):
         return False
 
 def is_taytl(url):
-    if url.find('page')!=-1:
-        return False 
-    if url.find('tip')!=-1:
+    if url.find('.html')!=-1:
         return True
     else:
         return False
+    # if url.find('page')!=-1:
+    #     return False 
+    # if url.find('tip')!=-1:
+    #     return True
+    # else:
+    #     return False
 
 def give_taytl_whits_page(url):
     r=requests.get(url)
@@ -217,6 +225,7 @@ def give_search_list(req,all=False,stat_bar=False):
         dl=0
         total_length=len(vd)
         for i in vd:
+            # print(i['link'])
             done = int(50 * dl / total_length)
             if stat_bar:
                 sys.stdout.write(f"\r[%s%s]  {print_name[:60]}... " % ('#' * done, '-' * (50-done)) )	
@@ -232,7 +241,7 @@ def give_search_list(req,all=False,stat_bar=False):
             dl+=1        
         return all_list
     else:
-        for i in vd:
+        for i in vd:            
             if is_taytl(clear_url(i['link'])):
                 all_list.append(taytl(clear_url(i['link'])))
     all_list=list(OrderedDict.fromkeys(all_list))
@@ -244,12 +253,12 @@ def give_search_list(req,all=False,stat_bar=False):
         return all_list
 
 def test():
-    poi='tate'#input('vv ')
+    poi='коносуба'#input('vv ')
     search=give_search_list(poi,False,True)
     if search==False:
-        print('Нічо ненайдено')
+        print('Нічого ненайдено')
         return None
-    print_list(search)
+    print_taytl(search)
     # for i in give_search_list(poi,True):
     #     print (i)
     # vd=google_search('kono')

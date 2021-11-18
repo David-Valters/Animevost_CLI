@@ -10,7 +10,7 @@ try:
     import traceback  #інформація про помилки
     import update
 except ImportError as e:
-        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможк то примусовов обновіть файли")
+        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt'")
 def input_v(min:int,maxx:int=None,list=[])->int:
     while True:
         try:
@@ -108,7 +108,7 @@ def choice_episod(taytl_var: taytl):
                 start=input_v(1,taytl_var.kl_ep)
                 print(f"По яку серію завантажувати({start}-{taytl_var.kl_ep}){spesh_info}? ",end='')
                 end=input_v(start,taytl_var.kl_ep)
-                v_yakist=quesBool("Завантажувати серії в якості 720? інакше 480")
+                v_yakist=quesBool("Вибрати серії в якості 720? інакше 480")
                 if v_yakist:
                     yak=720
                 else:
@@ -148,14 +148,14 @@ def choice_episod(taytl_var: taytl):
 def dop_op(taytl_var: taytl):
     while True:
         print('[1] - інші сезони цього тайтлу [2] - (NEW) [3]-(NEW) [0] - вернутись назад > ',end='')
-        v=input_v(0,2)
+        v=input_v(0,3)
         if v==1:
             # print('hzz',taytl_var.name)
             ll=taytl_var.give_all_taytl()
             if ll==None:
                 print('Немає інших сезонів')
                 continue
-            print_list(ll)
+            print_taytl(ll)
             print(f'Введіть номер тайтлу [1-{len(ll)}] або [0] - вернутись назад > ',end='')
             v=input_v(0,len(ll))
             if v==0:
@@ -173,35 +173,48 @@ def dop_op(taytl_var: taytl):
             print()
             return None
 
-def menu_episods(list_down,taytl):
-    download(list_down,taytl)
 def download(list_down,taytl_var):
     name_tt=taytl_var.name[:taytl_var.name.find('/')][:-1]
     inst.save_from(list_down,name_tt)
 
-def menu_taytl(taytl_var: taytl):
+def menu_taytl(taytl_var: taytl):# TODO menu
     list=choice_episod(taytl_var)
     if list==None:
         return
-    menu_episods(list,taytl_var)
+    print('[1]-завантажити [2]-добавити в плейліст [0]-головне меню')
+    v=input_v(0,2)
+    if v==1:
+        download(list,taytl_var)
+    elif v==2:
+        playlist.append([taytl_var,list])
+def playlist_def():
+    size=len(playlist)
+    print()
+    for i in range(0,size):
+        print(f'[{i+1}] '+playlist[i][0].name)
+    print()
+    v=quesBool('Завантажити')
+    if v:
+        for i in playlist:
+            download(i[1],i[0])
 def main():
     #-- var
     k_ser=6
-   
+    
     #-- 
     while 1:
-        print('\n\n[1]-Останні тайтли на сайті [2]-Посилання на тайтл [3]-Пошук [4]-Ваші нові серії [5]-Налаштування [0]-Вийти > ',end='')
-        v=input_v(0,5)
+        print('\n\n[1]-Останні тайтли на сайті [2]-Посилання на тайтл [3]-Пошук [4]-Ваші нові серії [5]-Плейліст [6]-Налаштування [0]-Вийти > ',end='')
+        v=input_v(0,6)
         if v==1:
             list=giv_end_list_taytls(main_url)  
-            print_list(list,max=k_ser)  
+            print_taytl(list,max=k_ser)  
             flag=True       
             while flag:
                 v=input('\nВедіть нормер тайтлу ('+'1-'+str(k_ser)+') або "+" - щоб вивести весь список('+str(len(list))+') 0-Головне Меню> ')
                 try:
                     if v == '+':
                         k_ser=len(list)
-                        print_list(list,max=k_ser)
+                        print_taytl(list,max=k_ser)
                     elif int(v)>0 and int(v)<=k_ser:
                         taytl_buf = list[int(v)-1]
                         if taytl_buf.giv_kl_ep()==0:
@@ -233,7 +246,7 @@ def main():
                 if search==False:
                     print('Нічого ненайдено')
                 else:
-                    print_list(search)  
+                    print_taytl(search)  
                     if full:
                         dop=""
                     else:
@@ -253,6 +266,8 @@ def main():
         elif v==4:
             print('В розробці')
         elif v==5:
+            playlist_def()
+        elif v==6:
             print('В розробці')
         elif v==0:
             print()
@@ -267,6 +282,10 @@ if __name__ == '__main__':
         # main_url='http://animevost.org'
         global nom_player
         nom_payer=0
+
+
+        global playlist
+        playlist=[]
         #---
         stan=update.isactual()
         if not stan:
