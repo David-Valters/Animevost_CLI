@@ -1,14 +1,16 @@
 print('start program')
 #cls; python main.py
  #clear ; python ./main.py 
-from sys import flags 
-import requests # відправка запитів дял отримання коу веб сторінки
-from bs4 import BeautifulSoup # парсинг сторіки
-import inst #мій модуль для завантаження
-from libery  import * #мій модуль з додатковивми фунуціями
-import traceback  #інформація про помилки
-import update
-
+try:
+    from sys import flags 
+    import requests # відправка запитів дял отримання коу веб сторінки
+    from bs4 import BeautifulSoup # парсинг сторіки
+    import inst #мій модуль для завантаження
+    from libery  import * #мій модуль з додатковивми фунуціями
+    import traceback  #інформація про помилки
+    import update
+except ImportError as e:
+        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможк то примусовов обновіть файли")
 def input_v(min:int,maxx:int=None,list=[])->int:
     while True:
         try:

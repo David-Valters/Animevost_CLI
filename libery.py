@@ -69,10 +69,12 @@ class taytl(taytl_base):
         self.all_taytl=s
         return s
         
-    def __init__(self, url, name=None,kl_ep=0,list_ep=None,list_dop_ep=None,soup=None):
+    def __init__(self, url, name=None,kl_ep=0,list_ep=None,list_dop_ep=None,soup=None,r=None):
         
         super().__init__(url,name)
-        r = requests.get(url)
+        if r==None:
+            # print(url)
+            r = requests.get(url)
         if r.status_code!=200:
             print("Error conect to site(information about the series): "+str(r.status_code))
         soup=BeautifulSoup(r.content, 'html.parser')
@@ -172,6 +174,8 @@ def quesBool(text,priority=1):
         return False
 
 def is_taytl(url):
+    if url.find('page')!=-1:
+        return False 
     if url.find('tip')!=-1:
         return True
     else:
@@ -192,7 +196,14 @@ def give_taytl_whits_page(url):
         # ll.append(i['href'])
         # print(i.text)
     return ll
+def clear_url(url):
+    lis=['dev.']
+    i1=url.find(lis[0])
 
+    if i1!=-1:
+        return url[:i1]+url[i1+len(lis[0]):]
+    else:
+        return url
 def give_search_list(req,all=False,stat_bar=False):
     print_name=""
     if stat_bar:
@@ -208,12 +219,12 @@ def give_search_list(req,all=False,stat_bar=False):
         for i in vd:
             done = int(50 * dl / total_length)
             if stat_bar:
-                sys.stdout.write(f"\r[%s%s]  {print_name[:80]}... " % ('#' * done, '-' * (50-done)) )	
+                sys.stdout.write(f"\r[%s%s]  {print_name[:60]}... " % ('#' * done, '-' * (50-done)) )	
                 sys.stdout.flush()
-            if is_taytl(i['link']):
-                all_list.append(taytl(i['link']))
+            if is_taytl(clear_url(clear_url(i['link']))):
+                all_list.append(taytl(clear_url(i['link'])))
             else:
-                ll=give_taytl_whits_page(i['link'])
+                ll=give_taytl_whits_page(clear_url(i['link']))
                 for j in ll:
                     print_name=j.name
                     # print('-',j)
@@ -222,8 +233,8 @@ def give_search_list(req,all=False,stat_bar=False):
         return all_list
     else:
         for i in vd:
-            if is_taytl(i['link']):
-                all_list.append(taytl(i['link']))
+            if is_taytl(clear_url(i['link'])):
+                all_list.append(taytl(clear_url(i['link'])))
     all_list=list(OrderedDict.fromkeys(all_list))
     if all_list==[] and all==False:
         if stat_bar:
@@ -233,8 +244,8 @@ def give_search_list(req,all=False,stat_bar=False):
         return all_list
 
 def test():
-    poi='наруто'#input('vv ')
-    search=give_search_list(poi,True,True)
+    poi='tate'#input('vv ')
+    search=give_search_list(poi,False,True)
     if search==False:
         print('Нічо ненайдено')
         return None
@@ -248,11 +259,12 @@ def test():
     # print(t.name)
 
     # for i in vd:
-    #     if is_taytl(i['link']):
+    #     if is_taytl(clear_url(i['link'])):
     #         print('\ntitle ',i['title'],'\n')
-    #         print('link ',i['link'],is_taytl(i['link']))
+    #         print('link ',clear_url(i['link']),is_taytl(clear_url(i['link'])))
 
 if __name__ == '__main__':
     test()
+    # print(clear_url('http://drv.animevost.org/tip/tv/115-boku-wa-tomodachi-ga-sukunai-add-on-disc.html'))
     # y=r'https://animevost.org/?do=search&mode=advanced&subaction=search&story=%D0%B1%D0%BE%D0%B3%D0%B8%D0%BD%D1%8F'
     # print(is_taytl(y))
