@@ -5,12 +5,10 @@ from sys import flags
 import requests # відправка запитів дял отримання коу веб сторінки
 from bs4 import BeautifulSoup # парсинг сторіки
 import inst #мій модуль для завантаження
-import libery #мій модуль з додатковивми фунуціями
+from libery  import * #мій модуль з додатковивми фунуціями
 import traceback  #інформація про помилки
-import re # регулярки
 import update
 
- 
 def input_v(min:int,maxx:int=None,list=[])->int:
     while True:
         try:
@@ -30,114 +28,6 @@ def input_v(min:int,maxx:int=None,list=[])->int:
             print('Введіть число ')  
             continue
         return v
-class taytl_base:
-    def __init__(self,url,name=""):
-        self.name=name
-        self.url=url
-    def giv_kl_ep(self):
-        name=self.name
-        i1=name.find('[')
-        i2=name.find(']')
-        name=name[i1+1:i2]
-        if name=='Анонс':
-            return 0
-        i1=name.find('-')
-        if i1==-1:
-            return 1
-        i2=name.find(' ',i1)
-        return int(name[i1+1:i2])
-    
-
-
-class taytl_base:
-    def __init__(self,url,name=""):
-        self.name=name
-        self.url=url
-    def giv_kl_ep(self):
-        name=self.name
-        i1=name.find('[')
-        i2=name.find(']')
-        name=name[i1+1:i2]
-        if name=='Анонс':
-            return 0
-        i1=name.find('-')
-        if i1==-1:
-            return 1
-        i2=name.find(' ',i1)
-        return int(name[i1+1:i2])
-    
-
-
-class taytl(taytl_base):
-    def giv_kl_ep(self):
-        return self.kl_ep
-    def set_list_episod(self):
-        for item in self.soup.find_all('script'):
-            if 'var data = {' in item.text:
-                text=item.text
-                break
-        ft='var data = '
-        i1=text.find(ft)
-        i2=text.find('}',i1)		
-        text2=text[i1+len(ft)+1:i2-1]
-        sps=text2.split(',')
-        s=[]
-        dop=[]
-        
-        for i in sps:
-            e=i.split(':')
-            e[0]=e[0][1:-1]
-            e[1]=e[1][1:-1]
-            if re.fullmatch(r"^(?!0.*$)([0-9]{1,4} серия)",e[0]):
-                s.append(e)
-            else:
-                dop.append(e)
-        self.kl_ep=len(s)+len(dop)
-        self.kl_dop_ep=len(dop)        
-        self.list_ep=s  
-        self.list_dop_ep=dop  
-
-    def give_all_taytl(self):
-        if self.all_taytl!=None:
-            return self.all_taytl
-        item=self.soup.find('ol')
-        if item==None:
-            return None
-        item=item.find_all('li')
-        s=[]
-        for i in item:
-            s.append(taytl_base(main_url+i.next['href'],i.text))
-        self.all_taytl=s
-        return s
-        
-    def __init__(self, url, name=None,kl_ep=0,list_ep=None,list_dop_ep=None,soup=None):
-        
-        super().__init__(url,name)
-        r = requests.get(url)
-        if r.status_code!=200:
-            print("Error conect to site(information about the series): "+str(r.status_code))
-        soup=BeautifulSoup(r.content, 'html.parser')
-        self.kl_dop_ep=0
-        self.all_taytl=None
-        if list_ep==None:
-            self.list_ep=None
-        if list_dop_ep==None:
-            self.list_dop_ep=None
-        if kl_ep==0:
-            self.kl_ep=0
-        
-        # file = open('sorc_site.txt',mode='r', encoding='utf-8')
-        # cont = file.read()
-        # file.close()
-        # soup=BeautifulSoup(cont, 'html.parser')
-
-        self.soup=soup
-        items = soup.find('h1')
-        name=items.text
-        while name[0]==' ' or name[0]=='\n' :
-            name=name[1:]
-        self.name=name
-        self.kl_ep=super().giv_kl_ep()
 
 def giv_end_taytls(url):# вертає html з даними про остані тайтли  
     r= requests.get(url)
@@ -148,25 +38,14 @@ def giv_end_taytls(url):# вертає html з даними про остані 
     items = soup.find('ul',class_='raspis raspis_fixed')
     el=items.findAll('a')
     return el
-
-def print_list(list,min=0,max=None):
-    print()
-    if max==None:
-        max=len(list)
-    for i in range(0,len(list)):
-        if(i<max):
-            print(f'[{i+1+min}] '+list[i].name)
-        else:
-            break
-    print()
-
-
+    
 def giv_end_list_taytls(url):#вертає список обєктів taytl
     el=giv_end_taytls(url)
     s=[]
     for i in el:
         s.append(taytl_base(i['href'],i.text))
     return s
+
 def make_ep_url(kod:str,quality:int=720)->str:
     global nom_payer
     urls_player=[f"https://play.agorov.org/{kod}?old=1",f"https://play.animegost.org/{kod}?player=9"]
@@ -192,6 +71,7 @@ def make_ep_url(kod:str,quality:int=720)->str:
     else:
         print('Немає такої якості')
         return None
+        
 def print_info_taytl(taytl_var: taytl):
     print(f"\nName: {taytl_var.name}")
     print(f"Серій {taytl_var.kl_ep} ",end="")
@@ -226,7 +106,7 @@ def choice_episod(taytl_var: taytl):
                 start=input_v(1,taytl_var.kl_ep)
                 print(f"По яку серію завантажувати({start}-{taytl_var.kl_ep}){spesh_info}? ",end='')
                 end=input_v(start,taytl_var.kl_ep)
-                v_yakist=libery.quesBool("Завантажувати серії в якості 720? інакше 480")
+                v_yakist=quesBool("Завантажувати серії в якості 720? інакше 480")
                 if v_yakist:
                     yak=720
                 else:
@@ -240,14 +120,14 @@ def choice_episod(taytl_var: taytl):
                     ep=taytl_var.list_dop_ep[-1]
                 else:
                     ep=taytl_var.list_ep[-1]
-                v_yakist=libery.quesBool("Завантажувати серію в якості 720? інакше 480")
+                v_yakist=quesBool("Завантажувати серію в якості 720? інакше 480")
                 if v_yakist:
                     dow_url=make_ep_url(ep[1],720)
                 else:
                     dow_url=make_ep_url(ep[1],480)
                 return [[ep[0],dow_url]]   
             elif v==3:
-                v_yakist=libery.quesBool("Завантажувати серії в якості 720? інакше 480")
+                v_yakist=quesBool("Завантажувати серії в якості 720? інакше 480")
                 if v_yakist:
                     yak=720
                 else:
@@ -274,7 +154,7 @@ def dop_op(taytl_var: taytl):
                 print('Немає інших сезонів')
                 continue
             print_list(ll)
-            print(f'Введіть номер тайтлу [1]-{len(ll)} або [0] - вернутись назад > ',end='')
+            print(f'Введіть номер тайтлу [1-{len(ll)}] або [0] - вернутись назад > ',end='')
             v=input_v(0,len(ll))
             if v==0:
                 return None
@@ -340,7 +220,34 @@ def main():
             taytl_var=taytl(url)
             menu_taytl(taytl_var)
         elif v==3:
-            print('В розробці')
+            full=False
+            while 1 :
+                if not full:
+                    req=input('(Введіть назву) або [0] - вийти > ')
+                    if v=='0':
+                        break
+                search=give_search_list(req,full,True)
+                full=False
+                if search==False:
+                    print('Нічого ненайдено')
+                else:
+                    print_list(search)  
+                    if full:
+                        dop=""
+                    else:
+                        dop="[+] - більше результатів"                  
+                    print(f'Введіть номер тайтлу [1-{len(search)}] {dop} [-] - новий пошук [0]-вихід > ',end='')
+                    v=input_v(0,len(search),['+','-'])
+                    if v==0:
+                        break
+                    elif v=='+':
+                        full=True
+                    elif v=='-':
+                        continue
+                    else:
+                        taytl_var=taytl(search[v-1].url)
+                        menu_taytl(taytl_var)
+                        break                
         elif v==4:
             print('В розробці')
         elif v==5:
@@ -352,23 +259,25 @@ def main():
             print('Не коректне введення!')
     
 if __name__ == '__main__':
+    #pipreqs --force
     try:
-        
-        global main_url
-        main_url='http://animevost.org'
+        # global main_url
+        # main_url='http://animevost.org'
         global nom_player
         nom_payer=0
         #---
         stan=update.isactual()
         if not stan:
             print('\nДоступне оновлення !!!!\n')
-            v=libery.quesBool('Оновити ?')
+            v=quesBool('Оновити ?')
             if v:
                 print('Початок оновлення')                
                 update.update()
                 print('\nПрограму оновлено, запустіть її щераз')
                 exit()
         main()
+    except ImportError as e:
+        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможк то примусовов обновіть файли")
     except requests.ConnectionError as e:
         print("OOPS!! Помилка з'єднання. Переконайтеся, що ви підключені до Інтернету.\n")
         print(str(e))			
