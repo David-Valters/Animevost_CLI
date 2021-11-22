@@ -1,18 +1,29 @@
 import os
 import sys
 import inspect
-from requests.models import parse_url
-from requests_html import HTMLSession
+from typing import List
+# from requests.models import parse_url
+from requests_html import HTMLSession #для пошуку
 import requests
 import re # регулярки
 from bs4 import BeautifulSoup # парсинг сторіки
 from collections import OrderedDict
+import json
 
 main_url='https://animevost.org'
+my_wl={"v":1,"list":{}}#список тайтлів 
+my_wl_name="my_watch_list.json"
+
 class taytl_base:
     def __init__(self,url,name=""):
         self.name=name
+        self.short_name=''
         self.url=url
+    def give_short_name(self):
+        if self.short_name!='':
+            return self.short_name
+        else:
+            return self.name[:self.name.find('/')][:-1]
     def giv_kl_ep(self):
         name=self.name
         i1=name.find('[')
@@ -252,28 +263,22 @@ def give_search_list(req,all=False,stat_bar=False):
     else:
         return all_list
 
+def write_mylist():
+    with open(my_wl_name, "w") as jsonfile:
+        json.dump(my_wl, jsonfile) # Writing to the file
+        jsonfile.close()
+
+def read_mylist():
+    with open(my_wl_name, "r") as jsonfile:
+        data = json.load(jsonfile) # Reading the file
+        jsonfile.close()
+        print(data)
+        data["list"]['hz']={}
+        data["list"]['1']={}
+        print(data)
+
 def test():
-    poi='коносуба'#input('vv ')
-    search=give_search_list(poi,False,True)
-    if search==False:
-        print('Нічого ненайдено')
-        return None
-    print_taytl(search)
-    # for i in give_search_list(poi,True):
-    #     print (i)
-    # vd=google_search('kono')
-
-    # u=(vd[1]['link'])
-    # t=taytl(u)
-    # print(t.name)
-
-    # for i in vd:
-    #     if is_taytl(clear_url(i['link'])):
-    #         print('\ntitle ',i['title'],'\n')
-    #         print('link ',clear_url(i['link']),is_taytl(clear_url(i['link'])))
+    read_mylist()
 
 if __name__ == '__main__':
     test()
-    # print(clear_url('http://drv.animevost.org/tip/tv/115-boku-wa-tomodachi-ga-sukunai-add-on-disc.html'))
-    # y=r'https://animevost.org/?do=search&mode=advanced&subaction=search&story=%D0%B1%D0%BE%D0%B3%D0%B8%D0%BD%D1%8F'
-    # print(is_taytl(y))

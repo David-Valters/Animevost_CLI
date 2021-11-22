@@ -3,7 +3,7 @@ print('start program')
  #clear ; python ./main.py 
 try:
     from sys import flags 
-    import requests # відправка запитів дял отримання коу веб сторінки
+    import requests # відправка запитів дял отримання коду веб сторінки
     from bs4 import BeautifulSoup # парсинг сторіки
     import inst #мій модуль для завантаження
     from libery  import * #мій модуль з додатковивми фунуціями
@@ -116,27 +116,27 @@ def choice_episod(taytl_var: taytl):
                 zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
 
                 lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],yak)] for i in range(start,end+1)]
-                return lll
+                return lll,taytl_var
             elif v==2:
                 if taytl_var.kl_ep==taytl_var.kl_dop_ep:
                     ep=taytl_var.list_dop_ep[-1]
                 else:
                     ep=taytl_var.list_ep[-1]
-                v_yakist=quesBool("Завантажувати серію в якості 720? інакше 480")
+                v_yakist=quesBool("Вибрати серії в якості 720? інакше 480")
                 if v_yakist:
                     dow_url=make_ep_url(ep[1],720)
                 else:
                     dow_url=make_ep_url(ep[1],480)
-                return [[ep[0],dow_url]]   
+                return [[ep[0],dow_url]],taytl_var   
             elif v==3:
-                v_yakist=quesBool("Завантажувати серії в якості 720? інакше 480")
+                v_yakist=quesBool("Вибрати серії в якості 720? інакше 480")
                 if v_yakist:
                     yak=720
                 else:
                     yak=480
                 zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
                 lll=[[zahal_ep[i][0],make_ep_url(zahal_ep[i][1],yak)] for i in range(0,taytl_var.kl_ep)]
-                return lll
+                return lll,taytl_var
             elif v==4:
                 new_taytl_var=dop_op(taytl_var)
                 if new_taytl_var!=None:
@@ -147,7 +147,7 @@ def choice_episod(taytl_var: taytl):
 
 def dop_op(taytl_var: taytl):
     while True:
-        print('[1] - інші сезони цього тайтлу [2] - (NEW) [3]-(NEW) [0] - вернутись назад > ',end='')
+        print('[1] - інші сезони цього тайтлу [2] - додаткова інформація(beta) [3]-(NEW) [0] - вернутись назад > ',end='')
         v=input_v(0,3)
         if v==1:
             # print('hzz',taytl_var.name)
@@ -165,7 +165,8 @@ def dop_op(taytl_var: taytl):
                 return taytl_var
         elif v==2:
             # додаткова інформація
-            print(' В розробці :)')
+            print(taytl_var.url)
+            # print(' В розробці :)')
         elif v==3:
             # добавити в дивлюся
             print(' В розробці :)')
@@ -173,12 +174,10 @@ def dop_op(taytl_var: taytl):
             print()
             return None
 
-def download(list_down,taytl_var):
-    name_tt=taytl_var.name[:taytl_var.name.find('/')][:-1]
-    inst.save_from(list_down,name_tt)
-
-def menu_taytl(taytl_var: taytl):# TODO menu
-    list=choice_episod(taytl_var)
+def download(list_down,taytl_var:taytl):
+    inst.save_from(list_down,taytl_var.give_short_name())
+def menu_taytl(taytl_var: taytl):
+    list,taytl_var=choice_episod(taytl_var)
     if list==None:
         return
     print('[1]-завантажити [2]-добавити в плейліст [0]-головне меню')
@@ -188,22 +187,45 @@ def menu_taytl(taytl_var: taytl):# TODO menu
     elif v==2:
         playlist.append([taytl_var,list])
 def playlist_def():
-    size=len(playlist)
-    print()
-    for i in range(0,size):
-        print(f'[{i+1}] '+playlist[i][0].name)
-    print()
-    v=quesBool('Завантажити')
-    if v:
-        for i in playlist:
-            download(i[1],i[0])
+    while True:
+        size=len(playlist)
+        if size==0:
+            print('Плейліст пустий, виберіть тайтл-епізоди-добавити в плейліст')
+            return None
+        print()
+        for i in range(0,size):
+            print(f'[{i+1}] '+playlist[i][0].name)
+        print()
+        print('[1/Enter] - Завантажити [2] - None [3]- Очистити плейліст [4]-Видалити один елемент [0] - Назад > ',end='')
+        v=input_v(0,5,[''])
+        if v==''or v==1:
+            for i in playlist:
+                download(i[1],i[0])
+            playlist.clear()
+            break
+        elif v==2:
+            print('В розробці')
+        elif v==3:
+            playlist.clear()
+            break
+        elif v==4:
+            print()
+            for i in range(0,size):
+                print(f'[{i+1}] '+playlist[i][0].name)
+            print()
+            print(f'Введіть номер елемента [1-{size}] > ',end='')
+            v=input_v(1,size)
+            playlist.pop(v-1)
+        elif v==0:
+            break
+
 def main():
     #-- var
     k_ser=6
     
     #-- 
     while 1:
-        print('\n\n[1]-Останні тайтли на сайті [2]-Посилання на тайтл [3]-Пошук [4]-Ваші нові серії [5]-Плейліст [6]-Налаштування [0]-Вийти > ',end='')
+        print('\n\n[1]-Останні тайтли на сайті [2]-Посилання на тайтл [3]-Пошук [4]-Мої тайтли [5]-Плейліст [6]-Налаштування [0]-Вийти > ',end='')
         v=input_v(0,6)
         if v==1:
             list=giv_end_list_taytls(main_url)  
@@ -286,6 +308,8 @@ if __name__ == '__main__':
 
         global playlist
         playlist=[]
+
+        ex_cod=1
         #---
         stan=update.isactual()
         if not stan:
@@ -296,13 +320,12 @@ if __name__ == '__main__':
                 update.update()
                 print('\nПрограму оновлено, запустіть її щераз')
                 exit()
-        main()
+        ex_cod=main()
     except ImportError as e:
         print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможк то примусовов обновіть файли")
     except requests.ConnectionError as e:
         print("OOPS!! Помилка з'єднання. Переконайтеся, що ви підключені до Інтернету.\n")
-        print(str(e))			
-        
+        print(str(e))			       
     except requests.Timeout as e:
         print("OOPS!! Timeout Error")
         print(str(e))
@@ -313,4 +336,7 @@ if __name__ == '__main__':
         
     except KeyboardInterrupt:
         print("\nХтось закрив програму")
-
+        ex_cod=0
+    
+    if ex_cod!=0:    
+        input()

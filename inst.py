@@ -31,11 +31,14 @@ def down(file_name,path,url):
 		else:
 			dl = 0
 			total_length = int(total_length)
+			finish=f"Done({convert_size(total_length)})             "
 			for data in response.iter_content(chunk_size=4096):
 				dl += len(data)
 				f.write(data)
 				done = int(50 * dl / total_length)
-				sys.stdout.write(f"\r[%s%s] {convert_size(dl,0)}/{convert_size(total_length)}   " % ('#' * done, '-' * (50-done)) )	
+				status=f"{convert_size(dl)}/{convert_size(total_length)}"
+
+				sys.stdout.write(f"\r[%s%s] {(lambda dl: status if dl!=total_length else finish    )(dl)}   " % ('#' * done, '-' * (50-done)) )	
 				sys.stdout.flush()
 			print()
 
