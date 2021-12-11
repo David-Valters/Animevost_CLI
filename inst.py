@@ -2,6 +2,8 @@ import requests
 import os
 import sys
 import math
+import cfg
+
 lb=r'<>:"/\|?*'
 
 def convert_size(size_bytes,write_type=1):
@@ -13,65 +15,75 @@ def convert_size(size_bytes,write_type=1):
    s = round(size_bytes / p, 2)
    s='%.2f' % s
    if(write_type):
-   	return "%s %s" % (s, size_name[i])
+       return "%s %s" % (s, size_name[i])
    else:
-   	return s
+       return s
 
 def down(file_name,path,url):
-	with open(path, "wb") as f:
-		response = requests.get(url, stream=True)
-		if response.status_code!=200:
-				print("Error conect to player: "+str(response.status_code))
-				return None
-		print("Downloading %s" % file_name)
-		total_length = response.headers.get('content-length')
+    with open(path, "wb") as f:
+        response = requests.get(url, stream=True)
+        if response.status_code!=200:
+                print("Error conect to player: "+str(response.status_code))
+                return None
+        print("Downloading %s" % file_name)
+        total_length = response.headers.get('content-length')
 
-		if total_length is None: # no content length header
-			f.write(response.content)
-		else:
-			dl = 0
-			total_length = int(total_length)
-			finish=f"Done({convert_size(total_length)})             "
-			for data in response.iter_content(chunk_size=4096):
-				dl += len(data)
-				f.write(data)
-				done = int(50 * dl / total_length)
-				status=f"{convert_size(dl)}/{convert_size(total_length)}"
+        if total_length is None: # no content length header
+            f.write(response.content)
+        else:
+            dl = 0
+            total_length = int(total_length)
+            finish=f"Done({convert_size(total_length)})             "
+            for data in response.iter_content(chunk_size=4096):
+                dl += len(data)
+                f.write(data)
+                done = int(50 * dl / total_length)
+                status=f"{convert_size(dl)}/{convert_size(total_length)}"
 
-				sys.stdout.write(f"\r[%s%s] {(lambda dl: status if dl!=total_length else finish    )(dl)}   " % ('#' * done, '-' * (50-done)) )	
-				sys.stdout.flush()
-			print()
+                sys.stdout.write(f"\r[%s%s] {(lambda dl: status if dl!=total_length else finish    )(dl)}   " % ('#' * done, '-' * (50-done)) )	
+                sys.stdout.flush()
+            print()
 
-def save_from(listt,name,path=""):
-	name=name.replace('\n', '')
-	for i in lb:
-		if(name.find(i)!=-1):
-			name=name.replace(i, '')
+def save_from(listt,name,path="",trow=False):
+    try:
+        name=name.replace('\n', '')
+        for i in lb:
+            if(name.find(i)!=-1):
+                name=name.replace(i, '')
+        dop_info=""
+        if cfg.settings['addName']==True:
+            dop_info=name
 
-	if path=='':
-		#path=os.getcwd()+("/Download/"+name)
-		path=os.path.join(os.getcwd(),"Download",name)
-	else:
-		path=os.path.join(path,name)
-	
-	if not os.path.exists(path):
-		os.makedirs(path)
-	print(name+'|')
-	print(path)
-	for l in listt:
-		url=l[1]
-		name_file=l[0]
-		
-		
-		#print("Start write "+str(name_file))
-		path_name=os.path.join(path,name_file+".mp4")
-		down(name_file,path_name,url)		
+        if path=='':
+            #path=os.getcwd()+("/Download/"+name)
+            path=os.path.join(os.getcwd(),"Download",name)
+        else:
+            path=os.path.join(path)
+        
+        if not os.path.exists(path):
+            os.makedirs(path)
+        print(name+'|')
+        print(path)
+        for l in listt:
+            url=l[1]
+            name_file=l[0]
+            
+            
+            #print("Start write "+str(name_file))
+            
+            path_name=os.path.join(path,name_file+" "+dop_info+".mp4")
+            
+            down(name_file,path_name,url)	
+    except KeyboardInterrupt:
+        if trow:
+            raise KeyboardInterrupt
+        else:
+            print("\nЗавантаження перервано")	
 
 def main():
-	url=[['1 серія','https://hd.trn.su/720/2147418055.mp4?md5=cKZR2TSd6M1bGl9E6cXxQA&time=1617988234&d=1']]
-	save_from(url,'defaul')
+    print('Запустіть main.py')
 
 if __name__ == '__main__':
-	main()
+    main()
 
 

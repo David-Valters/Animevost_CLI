@@ -7,11 +7,13 @@ from requests_html import HTMLSession #для пошуку
 import requests
 import re # регулярки
 from bs4 import BeautifulSoup # парсинг сторіки
+import cfg
 from collections import OrderedDict
 import json
+import datetime
 
 main_url='https://animevost.org'
-my_wl={"v":1,"list":{}}#список тайтлів 
+
 my_wl_name="my_watch_list.json"
 
 class taytl_base:
@@ -19,11 +21,22 @@ class taytl_base:
         self.name=name
         self.short_name=''
         self.url=url
+    def __repr__(self):
+        return "taytl_base({!r}, {!r})".format(self.url, self.name)
+    def __eq__(self, other):
+        return (self.name) == (other.name)
+    def __hash__(self):
+        return hash((self.name))
+
     def give_short_name(self):
         if self.short_name!='':
             return self.short_name
         else:
-            return self.name[:self.name.find('/')][:-1]
+            i1=self.name.find('~')
+            if i1!=-1:
+                return self.name[:i1-1]
+            else:
+                return self.name[:self.name.find('/')][:-1]
     def giv_kl_ep(self):
         name=self.name
         i1=name.find('[')
@@ -108,6 +121,49 @@ class taytl(taytl_base):
             name=name[:-1]
         self.name=name
         self.kl_ep=super().giv_kl_ep()
+
+def giv_end_taytls(url):# вертає html з даними про остані тайтли  
+    r= requests.get(url)
+    if r.status_code!=200:
+        print("Error conect to site(list taytl): "+str(r.status_code))
+        return None
+    soup=BeautifulSoup(r.content, 'html.parser')
+    items = soup.find('ul',class_='raspis raspis_fixed')
+    el=items.findAll('a')
+    return el
+    
+def giv_end_list_taytls(url):#вертає список обєктів taytl
+    el=giv_end_taytls(url)
+    s=[]
+    for i in el:
+        s.append(taytl_base(i['href'],i.text))
+    return s
+
+def make_ep_url(kod:str,quality:int=720)->str:
+    # global nom_payer
+    urls_player=[f"https://play.agorov.org/{kod}?old=1",f"https://play.animegost.org/{kod}?player=9"]
+    while True:
+        r= requests.get(urls_player[cfg.nom_payer])
+        if r.status_code!=200:
+            print(f"Error conect to base -{cfg.nom_payer+1}-: "+str(r.status_code))
+            print("Start use next base")
+            if len(urls_player)==cfg.nom_payer+1:
+                print("E R R O R conect to base`s")
+                return None
+            else:
+                cfg.nom_payer=+1
+        else:
+            break
+    soup=BeautifulSoup(r.content, 'html.parser')
+    items = soup.findAll('a',class_="butt")
+
+    if quality==480:
+        return items[0]["href"]
+    elif quality==720:
+        return items[1]["href"]
+    else:
+        print('Немає такої якості')
+        return None
 
 def get_source(url):#search def
     try:
@@ -223,6 +279,10 @@ def clear_url(url):
         return url[:i1]+url[i1+len(lis[0]):]
     else:
         return url
+
+def del_doubling(l):
+    return list(OrderedDict.fromkeys(l).keys())
+
 def give_search_list(req,all=False,stat_bar=False):
     print_name=""
     if stat_bar:
@@ -255,30 +315,111 @@ def give_search_list(req,all=False,stat_bar=False):
         for i in vd:            
             if is_taytl(clear_url(i['link'])):
                 all_list.append(taytl(clear_url(i['link'])))
-    all_list=list(OrderedDict.fromkeys(all_list))
     if all_list==[] and all==False:
         if stat_bar:
             print('Активація додаткового пошуку...')
-        return give_search_list(req,True,stat_bar)
-    else:
-        return all_list
+        all_list= give_search_list(req,True,stat_bar)
+    all_list=del_doubling(all_list)
+    return all_list
 
 def write_mylist():
     with open(my_wl_name, "w") as jsonfile:
-        json.dump(my_wl, jsonfile) # Writing to the file
-        jsonfile.close()
+        json.dump(cfg.my_wl, jsonfile) # Writing to the file
+def add_taytl_in_wl(wl_taytl):
+    cfg.my_wl['list'].append(wl_taytl)
+    write_mylist()
 
-def read_mylist():
-    with open(my_wl_name, "r") as jsonfile:
-        data = json.load(jsonfile) # Reading the file
-        jsonfile.close()
-        print(data)
-        data["list"]['hz']={}
-        data["list"]['1']={}
-        print(data)
+def create_wl_list():
+    cfg.my_wl={"v":cfg.v_my_wl,"list":[]}
+    write_mylist()
 
-def test():
-    read_mylist()
+def read_mylist():   
+    try:
+        with open(my_wl_name, "r") as jsonfile:
+            data = json.load(jsonfile) # Reading the file
+            return data
+    except KeyError as e:  
+        print(f'Файл {my_wl_name} з списком ваших тайтлів пошкоджений')  
+    except json.decoder.JSONDecodeError as e:
+        print(f'Файл {my_wl_name} з списком ваших тайтлів пошкоджений')
+    except FileNotFoundError as e:
+        print(f'Файл {my_wl_name} з списком ваших тайтлів не знайдено')
+
+def print_my_list(my_list,my_def,start=1):
+    k=start
+    for i in my_list:
+        print(f'[{k}]',my_def(i))
+        k+=1
+def give_raspis():
+    r=requests.get(main_url)
+    soup=BeautifulSoup(r.content, 'html.parser')
+    items=soup.findAll('div',class_="raspis")
+    list=[]
+    day=[]
+    for i in items:
+        aa=i.findAll('a')
+        for j in aa:
+            day.append(taytl_base(main_url+j['href'],j.text))
+        list.append(day.copy())        
+        day.clear()   
+    return list
+
+def give_urls(taytl_var,start,end,yak):
+    taytl_var.set_list_episod()
+    zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
+    lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],yak)] for i in range(start,end+1)]
+    return lll
+
+def give_my_taytl():
+    l=giv_end_list_taytls(main_url)
+    new_in_site=[]
+    if len(cfg.end_taytl)!=0:
+        set_difference = set(l) - set(cfg.end_taytl)
+        new_in_site = list(set_difference)      
+    else:
+        new_in_site=l
+    
+    if len(new_in_site)!=0:
+        index=0
+        
+        for i in cfg.my_wl['list']:
+            o=None
+            for j in new_in_site:
+                if i['name']==j.give_short_name():
+                    o=j
+                    break
+            
+            if not o:
+                o=taytl_base(taytl(i['url']).url,taytl(i['url']).name)
+            riz=o.giv_kl_ep()-i['ep']
+            if riz!=0:
+                cop=i.copy()
+                cop['+']=riz
+                cop['n_wl']=index
+                fl=True
+                for q in cfg.wl:
+                    if q['name']==cop['name']:
+                        fl=False
+                        break
+                if fl:
+                    cfg.wl.append(cop)
+            index+=1
+
+    cfg.end_taytl=l 
+    return cfg.wl
+
+def test(): 
+    print('start')
+    cfg.my_wl= read_mylist()
+    print('end read')
+    g=give_my_taytl() 
+    print(g)
+    print('---------------')
+    g=give_my_taytl() 
+    print(g)
+    
+
+
 
 if __name__ == '__main__':
-    test()
+    print('Запустіть main.py')

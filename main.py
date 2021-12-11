@@ -1,3 +1,8 @@
+from math import trunc
+from os import name
+from typing import Counter
+
+
 print('start program')
 #cls; python main.py
  #clear ; python ./main.py 
@@ -30,49 +35,6 @@ def input_v(min:int,maxx:int=None,list=[])->int:
             print('Введіть число ')  
             continue
         return v
-
-def giv_end_taytls(url):# вертає html з даними про остані тайтли  
-    r= requests.get(url)
-    if r.status_code!=200:
-        print("Error conect to site(list taytl): "+str(r.status_code))
-        return None
-    soup=BeautifulSoup(r.content, 'html.parser')
-    items = soup.find('ul',class_='raspis raspis_fixed')
-    el=items.findAll('a')
-    return el
-    
-def giv_end_list_taytls(url):#вертає список обєктів taytl
-    el=giv_end_taytls(url)
-    s=[]
-    for i in el:
-        s.append(taytl_base(i['href'],i.text))
-    return s
-
-def make_ep_url(kod:str,quality:int=720)->str:
-    global nom_payer
-    urls_player=[f"https://play.agorov.org/{kod}?old=1",f"https://play.animegost.org/{kod}?player=9"]
-    while True:
-        r= requests.get(urls_player[nom_payer])
-        if r.status_code!=200:
-            print(f"Error conect to base -{nom_payer+1}-: "+str(r.status_code))
-            print("Start use next base")
-            if len(urls_player)==nom_payer+1:
-                print("E R R O R conect to base`s")
-                return None
-            else:
-                nom_payer=nom_payer+1
-        else:
-            break
-    soup=BeautifulSoup(r.content, 'html.parser')
-    items = soup.findAll('a',class_="butt")
-
-    if quality==480:
-        return items[0]["href"]
-    elif quality==720:
-        return items[1]["href"]
-    else:
-        print('Немає такої якості')
-        return None
         
 def print_info_taytl(taytl_var: taytl):
     print(f"\nName: {taytl_var.name}")
@@ -85,14 +47,14 @@ def print_info_taytl(taytl_var: taytl):
 def choice_episod(taytl_var: taytl):
     while True:
         taytl_var.set_list_episod()
-        print_info_taytl(taytl_var)
+        
         if taytl_var.kl_ep==taytl_var.kl_dop_ep:
             number_last_ep=taytl_var.kl_dop_ep
         else:
             number_last_ep=taytl_var.kl_ep-taytl_var.kl_dop_ep
         while True:
-            print(f"[1]-Вибрати декілька серій [2]-вибрати останню серію - ({number_last_ep}) [3]-вибрати все ({taytl_var.kl_ep}) [4] - додаткові можливочті [0]-Головне Меню > ",end='')
-            v=input_v(0,4)
+            print(f"[1]-Вибрати декілька серій [2]-вибрати останню серію - ({number_last_ep}) [3]-вибрати все ({taytl_var.kl_ep}) [0]-повернутись назад > ",end='')
+            v=input_v(0,3)
             if v==0:
                 print()
                 return None
@@ -116,7 +78,7 @@ def choice_episod(taytl_var: taytl):
                 zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
 
                 lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],yak)] for i in range(start,end+1)]
-                return lll,taytl_var
+                return lll
             elif v==2:
                 if taytl_var.kl_ep==taytl_var.kl_dop_ep:
                     ep=taytl_var.list_dop_ep[-1]
@@ -127,7 +89,7 @@ def choice_episod(taytl_var: taytl):
                     dow_url=make_ep_url(ep[1],720)
                 else:
                     dow_url=make_ep_url(ep[1],480)
-                return [[ep[0],dow_url]],taytl_var   
+                return [[ep[0],dow_url]]  
             elif v==3:
                 v_yakist=quesBool("Вибрати серії в якості 720? інакше 480")
                 if v_yakist:
@@ -136,56 +98,91 @@ def choice_episod(taytl_var: taytl):
                     yak=480
                 zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
                 lll=[[zahal_ep[i][0],make_ep_url(zahal_ep[i][1],yak)] for i in range(0,taytl_var.kl_ep)]
-                return lll,taytl_var
-            elif v==4:
-                new_taytl_var=dop_op(taytl_var)
-                if new_taytl_var!=None:
-                    taytl_var=new_taytl_var
-                    break
+                return lll
+            # elif v==4:
+            #     new_taytl_var=dop_op(taytl_var)
+            #     if new_taytl_var!=None:
+            #         taytl_var=new_taytl_var
+            #         break
             else:
                 print('Не коректне введення!')
 
-def dop_op(taytl_var: taytl):
+def download(list_down,taytl_var:taytl):
+        inst.save_from(list_down,taytl_var.give_short_name())
+    
+def menu_taytl(taytl_var: taytl):
     while True:
-        print('[1] - інші сезони цього тайтлу [2] - додаткова інформація(beta) [3]-(NEW) [0] - вернутись назад > ',end='')
-        v=input_v(0,3)
-        if v==1:
-            # print('hzz',taytl_var.name)
+        print_info_taytl(taytl_var)
+        print('\n[1/Enter] - вибрати епізоди\n[2] - додати в мої тайтли\n[3] - інші сезони цього тайтлу\n[4] - додаткова інформація(beta)\n[0] - назад\n> ',end='')
+        # list,taytl_var=choice_episod(taytl_var)
+        v=input_v(0,4,[''])
+        if v==0:
+            return
+        elif v=='' or v==1 :
+            list_down=choice_episod(taytl_var)
+            if list_down==None:
+                return
+            print('\n[1/Enter] - завантажити [2]-добавити в плейліст [0]-назад > ',end='')
+            v=input_v(0,2,[''])
+            if v==''or v==1:
+                download(list_down,taytl_var)
+                break
+            elif v==2:
+                playlist.append([taytl_var,list_down])
+                break
+            elif v==0:
+                continue
+            else:
+                print('IT`s BUG !!!')
+        elif v==2:
+            if cfg.my_wl==None:
+                print('Відсутній список ваших тайтлів !')
+                n=quesBool('Створити файл зі списком ?')
+                if n:
+                    cfg.my_wl=create_wl_list()
+                else:
+                    return None
+            name=taytl_var.give_short_name()
+            
+            size_my_wl=len(cfg.my_wl['list'])
+            flag=False
+            for i in range(size_my_wl):
+                if cfg.my_wl['list'][i]['name']==name:
+                    print('Цей тайтл вже є в вашому списку "мої тайтли"\n')
+                    flag=True
+            if flag:
+                break
+
+            tat={}
+            tat['name']=name
+            tat['url']=taytl_var.url
+            if taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep!=1:
+                print(f'Введіть номер останньої серії яку ви переглядали [1-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія > ',end='')
+                n=input_v(1,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,[''])
+                if n=='':
+                    tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
+                else:
+                    tat['ep']=n
+            else:
+                tat['ep']=1
+            add_taytl_in_wl(tat)
+            print('Добавлено')
+            break
+        elif v==3:
             ll=taytl_var.give_all_taytl()
             if ll==None:
                 print('Немає інших сезонів')
                 continue
             print_taytl(ll)
-            print(f'Введіть номер тайтлу [1-{len(ll)}] або [0] - вернутись назад > ',end='')
+            print(f'Введіть номер тайтлу [1-{len(ll)}] або [0] - повернутись назад > ',end='')
             v=input_v(0,len(ll))
             if v==0:
-                return None
+                continue
             else:
                 taytl_var = taytl(taytl_var.give_all_taytl()[v-1].url)
-                return taytl_var
-        elif v==2:
-            # додаткова інформація
+        elif v==4:
             print(taytl_var.url)
-            # print(' В розробці :)')
-        elif v==3:
-            # добавити в дивлюся
-            print(' В розробці :)')
-        elif v==0:
-            print()
-            return None
 
-def download(list_down,taytl_var:taytl):
-    inst.save_from(list_down,taytl_var.give_short_name())
-def menu_taytl(taytl_var: taytl):
-    list,taytl_var=choice_episod(taytl_var)
-    if list==None:
-        return
-    print('[1]-завантажити [2]-добавити в плейліст [0]-головне меню')
-    v=input_v(0,2)
-    if v==1:
-        download(list,taytl_var)
-    elif v==2:
-        playlist.append([taytl_var,list])
 def playlist_def():
     while True:
         size=len(playlist)
@@ -204,7 +201,7 @@ def playlist_def():
             playlist.clear()
             break
         elif v==2:
-            print('В розробці')
+            print('В розробці')#vlc
         elif v==3:
             playlist.clear()
             break
@@ -218,21 +215,36 @@ def playlist_def():
             playlist.pop(v-1)
         elif v==0:
             break
+def edit_num_ep(num):
+    taytl_var=taytl(cfg.my_wl['list'][num]['url'])
+    print(f'Введіть номер останньої серії яку ви переглядали [1-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія > ',end='')
+    n=input_v(1,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,[''])
+
+    if n=='':
+        cfg.my_wl['list'][num]['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
+    else:
+        cfg.my_wl['list'][num]['ep']=n
+    write_mylist() 
+    cfg.end_taytl=[]   
+    cfg.wl=[]
+    print('\nЗмінено')
+
 
 def main():
     #-- var
     k_ser=6
-    
+    # global my_wl
+    cfg.my_wl= read_mylist()
     #-- 
     while 1:
-        print('\n\n[1]-Останні тайтли на сайті [2]-Посилання на тайтл [3]-Пошук [4]-Мої тайтли [5]-Плейліст [6]-Налаштування [0]-Вийти > ',end='')
-        v=input_v(0,6)
+        print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Налаштування\n[0]-Вийти\n> ',end='')
+        v=input_v(0,7)
         if v==1:
             list=giv_end_list_taytls(main_url)  
             print_taytl(list,max=k_ser)  
             flag=True       
             while flag:
-                v=input('\nВедіть нормер тайтлу ('+'1-'+str(k_ser)+') або "+" - щоб вивести весь список('+str(len(list))+') 0-Головне Меню> ')
+                v=input('\nВедіть нормер тайтлу ('+'1-'+str(k_ser)+') або "+" - щоб вивести весь список('+str(len(list))+') 0-Головне Меню > ')
                 try:
                     if v == '+':
                         k_ser=len(list)
@@ -285,11 +297,116 @@ def main():
                         taytl_var=taytl(search[v-1].url)
                         menu_taytl(taytl_var)
                         break                
-        elif v==4:
-            print('В розробці')
+        elif v==4:     
+            if cfg.my_wl==None:
+                print('Відсутній список ваших тайтлів !')
+                n=quesBool('Створити файл зі списком ?')
+                if n:
+                    create_wl_list()
+                else:
+                    continue
+            print()
+            if len(cfg.my_wl['list'])==0:
+                print('Ви не добавили ні одного тайтла в "мої тайтли"')
+                continue
+            print('Завантаження...')
+            give_my_taytl()
+            fll=True
+            if len(cfg.wl)==0:
+                print('Немає нових серій')
+                fll=False
+            if fll:
+                # print(cfg.wl)
+                print_my_list(cfg.wl,lambda x:f"{x['name']} - ({x['+']})")
+            # print_my_list(cfg.my_wl['list'],lambda i:f"{i['name']} {i['ep']}" )
+            while True:
+                if fll:
+                    print('\n[1/Enter] - Завантажити\n[2] - None\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
+                else:
+                    print('\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
+                if fll:
+                    v=input_v(0,3,[''])
+                else:
+                    v=input_v(3,3,['0'])
+                if v==0 or v=='0':
+                    break
+                elif v==1 or v=='':
+                    try:
+                        print("Завантаження даних...")
+                        name_folder=datetime.datetime.today().strftime("%m.%d.%Y")
+                        name_folder=os.path.join(os.getcwd(),"Download","My taytls",name_folder)
+                        cop_wl=cfg.wl.copy()
+                        for j in cop_wl:
+                            taytl_var=taytl(j['url'])
+                            taytl_var.set_list_episod()
+                            zahal_ep=taytl_var.list_ep
+                            #
+                            lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
+                            inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
+                            cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
+                            cfg.wl.remove(j)
+                            write_mylist()
+                        break
+                    except KeyboardInterrupt:
+                        print("\nЗавантаження перервано")
+                elif v==2:
+                    print('В розробці')
+                elif v==3:
+                    print('\n[1] - Видалити по номеру\n[2] - Видалити тайтли які вже завершились\n[3] - Змінити номер номер останньої серії\n[0] - Назад\n> ',end='')
+                    v=input_v(0,3)
+                    if v==1:
+                        while True:
+                            count=len(cfg.my_wl['list'])
+                            if count==0:
+                                print('\nСписок ваших тайтлів пустий\n')
+                                break
+                            print()
+                            print_my_list(cfg.my_wl['list'],lambda i:f"{i['name']} {i['ep']}" )
+                            print(f'\nВведіть номер тайтла [1-{count}] щоб видалити зі списку або [0] - Назад  > ',end='')
+                            v=input_v(0,count)
+                            if v==0:
+                                break
+                            else:
+                                name=cfg.my_wl['list'][v-1]['name']
+                                cfg.my_wl['list'].pop(v-1)
+                                write_mylist()
+                                print(f'Видалено:\n- {name}\n')
+                    elif v==2:
+                        print('В розробці')
+                    elif v==3:
+                        count=len(cfg.my_wl['list'])
+                        while True:
+                            print()
+                            print_my_list(cfg.my_wl['list'],lambda i:f"{i['name']} {i['ep']}" )
+                            print(f'\nВведіть номер тайтла [1-{count}] щоб змінити серію або [0] - Назад  > ',end='')
+                            v=input_v(0,count)
+                            if v==0:
+                                break
+                            else:
+                                edit_num_ep(v-1)
+
+                        
         elif v==5:
             playlist_def()
         elif v==6:
+            ll=give_raspis()
+            size_rozk=0
+            zagal=[]
+            name_day=['Понеділок','Вівторок','Середа','Четвер',"П'ятниця",'Субота','Неділя']
+            for i in range(7):
+                print(f"-------------------{name_day[i]}-------------------")
+                print_my_list(ll[i],lambda x:x.name,size_rozk+1)
+                size_rozk+=len(ll[i])
+                zagal.extend(ll[i])
+            while True:
+                print(f'\nВедіть номер тайтла [1-{size_rozk}] щоб вибрати його або [0] - Вийти > ',end='')
+                n=input_v(0,size_rozk)
+                if n==0:
+                    break
+                else:
+                    var=zagal[n-1]
+                    menu_taytl(taytl(var.url))                
+        elif v==7:
             print('В розробці')
         elif v==0:
             print()
@@ -299,18 +416,15 @@ def main():
     
 if __name__ == '__main__':
     #pipreqs --force
+    #clear; python main.py
     try:
-        # global main_url
-        # main_url='http://animevost.org'
-        global nom_player
-        nom_payer=0
-
-
+        #global nom_player
+        
         global playlist
         playlist=[]
 
         ex_cod=1
-        #---
+        #TOD upda
         stan=update.isactual()
         if not stan:
             print('\nДоступне оновлення !!!!\n')
@@ -322,7 +436,8 @@ if __name__ == '__main__':
                 exit()
         ex_cod=main()
     except ImportError as e:
-        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможк то примусовов обновіть файли")
+        print(' ')
+        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможt то примусовов обновіть файли 'python update.py'")
     except requests.ConnectionError as e:
         print("OOPS!! Помилка з'єднання. Переконайтеся, що ви підключені до Інтернету.\n")
         print(str(e))			       
