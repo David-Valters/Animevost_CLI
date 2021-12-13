@@ -5,6 +5,7 @@ my_wl={"v":v_my_wl,"list":[]}#список тайтлів
 settings={
 	'v':v_settings,
 	'addName':True,
+	'allchek':False
 }
 wl=[]
 end_taytl=[]

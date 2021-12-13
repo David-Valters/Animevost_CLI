@@ -378,19 +378,31 @@ def give_my_taytl():
         new_in_site = list(set_difference)      
     else:
         new_in_site=l
-    
     if len(new_in_site)!=0:
-        index=0
-        
+        index=0#TODO myt   
+        done=0
+        dl=0
+        total_length=len(cfg.my_wl['list'])  
+        pr=' '   
         for i in cfg.my_wl['list']:
+            dl+=1
+            done = int(50 * dl / total_length)
+            sys.stdout.write(f"\r[%s%s] {pr}" % ('#' * done, '-' * (50-done)) )	
+            sys.stdout.flush()
             o=None
             for j in new_in_site:
                 if i['name']==j.give_short_name():
                     o=j
                     break
-            
             if not o:
-                o=taytl_base(taytl(i['url']).url,taytl(i['url']).name)
+                if cfg.settings['allchek']:
+                    o=taytl_base(taytl(i['url']).url,taytl(i['url']).name)
+                    pr='*'
+                else:
+                    continue
+            else:
+                pr=' '
+
             riz=o.giv_kl_ep()-i['ep']
             if riz!=0:
                 cop=i.copy()
@@ -403,23 +415,28 @@ def give_my_taytl():
                         break
                 if fl:
                     cfg.wl.append(cop)
-            index+=1
-
+            index+=1            
+    print()
+    print()
     cfg.end_taytl=l 
     return cfg.wl
 
 def test(): 
-    print('start')
-    cfg.my_wl= read_mylist()
-    print('end read')
-    g=give_my_taytl() 
-    print(g)
-    print('---------------')
-    g=give_my_taytl() 
-    print(g)
+    k=[1,2,3,4,5,6,7,8]
+    n=len(k)
+    done=1
+    dl=0
+    total_length=n
+    for i in range(n):
+        dl+=1
+        done = int(50 * dl / total_length)
+        sys.stdout.write(f"\r[%s%s] {i} {done}" % ('#' * done, '-' * (50-done)) )	
+        sys.stdout.flush()
+        
     
 
 
 
 if __name__ == '__main__':
-    print('Запустіть main.py')
+    # print('Запустіть main.py')
+    test()

@@ -316,9 +316,7 @@ def main():
                 print('Немає нових серій')
                 fll=False
             if fll:
-                # print(cfg.wl)
                 print_my_list(cfg.wl,lambda x:f"{x['name']} - ({x['+']})")
-            # print_my_list(cfg.my_wl['list'],lambda i:f"{i['name']} {i['ep']}" )
             while True:
                 if fll:
                     print('\n[1/Enter] - Завантажити\n[2] - None\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
@@ -333,14 +331,13 @@ def main():
                 elif v==1 or v=='':
                     try:
                         print("Завантаження даних...")
-                        name_folder=datetime.datetime.today().strftime("%m.%d.%Y")
+                        name_folder=datetime.datetime.today().strftime("%d.%m.%Y")
                         name_folder=os.path.join(os.getcwd(),"Download","My taytls",name_folder)
                         cop_wl=cfg.wl.copy()
                         for j in cop_wl:
                             taytl_var=taytl(j['url'])
-                            taytl_var.set_list_episod()
+                            taytl_var.set_list_episod()          
                             zahal_ep=taytl_var.list_ep
-                            #
                             lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
                             inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
                             cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
