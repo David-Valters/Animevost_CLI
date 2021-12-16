@@ -119,6 +119,9 @@ def menu_taytl(taytl_var: taytl):
         if v==0:
             return
         elif v=='' or v==1 :
+            if taytl_var.giv_kl_ep()==0:
+                print('Це Анонс,серій ще немає')
+                continue
             list_down=choice_episod(taytl_var)
             if list_down==None:
                 return
@@ -156,7 +159,7 @@ def menu_taytl(taytl_var: taytl):
             tat={}
             tat['name']=name
             tat['url']=taytl_var.url
-            if taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep!=1:
+            if taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep>1:
                 print(f'Введіть номер останньої серії яку ви переглядали [1-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія > ',end='')
                 n=input_v(1,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,[''])
                 if n=='':
@@ -164,7 +167,7 @@ def menu_taytl(taytl_var: taytl):
                 else:
                     tat['ep']=n
             else:
-                tat['ep']=1
+                tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
             add_taytl_in_wl(tat)
             print('Добавлено')
             break
@@ -237,8 +240,8 @@ def main():
     cfg.my_wl= read_mylist()
     #-- 
     while 1:
-        print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Налаштування\n[0]-Вийти\n> ',end='')
-        v=input_v(0,7)
+        print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Історія\n[8]-Налаштування\n[0]-Вийти\n> ',end='')
+        v=input_v(0,8)
         if v==1:
             list=giv_end_list_taytls(main_url)  
             print_taytl(list,max=k_ser)  
@@ -251,10 +254,6 @@ def main():
                         print_taytl(list,max=k_ser)
                     elif int(v)>0 and int(v)<=k_ser:
                         taytl_buf = list[int(v)-1]
-                        if taytl_buf.giv_kl_ep()==0:
-                            print('Це Анонс,серій ще немає')
-                            flag=False
-                            continue
                         taytl_var = taytl(taytl_buf.url,taytl_buf.name)
                         flag=False
                         menu_taytl(taytl_var)
@@ -380,9 +379,7 @@ def main():
                             if v==0:
                                 break
                             else:
-                                edit_num_ep(v-1)
-
-                        
+                                edit_num_ep(v-1)                       
         elif v==5:
             playlist_def()
         elif v==6:
@@ -404,6 +401,8 @@ def main():
                     var=zagal[n-1]
                     menu_taytl(taytl(var.url))                
         elif v==7:
+            print('В розробці')
+        elif v==8:
             print('В розробці')
         elif v==0:
             print()

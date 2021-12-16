@@ -89,7 +89,11 @@ class taytl(taytl_base):
         item=item.find_all('li')
         s=[]
         for i in item:
-            s.append(taytl_base(main_url+i.next['href'],i.text))
+            # print(main_url+i.next['href'])
+            if i.next['href'][0]=='/':
+                s.append(taytl_base(main_url+i.next['href'],i.text))
+            else:
+                s.append(taytl_base(i.next['href'],i.text))
         self.all_taytl=s
         return s
         
@@ -379,7 +383,7 @@ def give_my_taytl():
     else:
         new_in_site=l
     if len(new_in_site)!=0:
-        index=0#TODO myt   
+        index=0   
         done=0
         dl=0
         total_length=len(cfg.my_wl['list'])  
@@ -399,6 +403,7 @@ def give_my_taytl():
                     o=taytl_base(taytl(i['url']).url,taytl(i['url']).name)
                     pr='*'
                 else:
+                    index+=1
                     continue
             else:
                 pr=' '
@@ -438,5 +443,5 @@ def test():
 
 
 if __name__ == '__main__':
-    # print('Запустіть main.py')
-    test()
+    print('Запустіть main.py')
+    #test()
