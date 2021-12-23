@@ -15,7 +15,8 @@ import datetime
 main_url='https://animevost.org'
 
 my_wl_name="my_watch_list.json"
-
+history_file_name="history_list.json"
+viewed_file_name="viewed_list.json"
 class taytl_base:
     def __init__(self,url,name=""):
         self.name=name
@@ -49,6 +50,18 @@ class taytl_base:
             return 1
         i2=name.find(' ',i1)
         return int(name[i1+1:i2])
+    def giv_end_kl_ep(self)->int:
+        name=self.name
+        i1=name.find('[')
+        i2=name.find(']')
+        ep=name[i1+1:i2]
+        if ep=='Анонс':
+            return 0
+        i3=ep.find('из')
+        kl_ep=ep[i3+3:i2]
+        if kl_ep[-1]=='+':
+            kl_ep=kl_ep[:-1]
+        return int(kl_ep)
 
 
 class taytl(taytl_base):
@@ -351,9 +364,11 @@ def read_mylist():
 
 def print_my_list(my_list,my_def,start=1):
     k=start
+    print()
     for i in my_list:
         print(f'[{k}]',my_def(i))
         k+=1
+    print()
 def give_raspis():
     r=requests.get(main_url)
     soup=BeautifulSoup(r.content, 'html.parser')
@@ -400,7 +415,7 @@ def give_my_taytl():
                     break
             if not o:
                 if cfg.settings['allchek']:
-                    o=taytl_base(taytl(i['url']).url,taytl(i['url']).name)
+                    o=taytl(i['url'])
                     pr='*'
                 else:
                     index+=1
@@ -425,23 +440,68 @@ def give_my_taytl():
     print()
     cfg.end_taytl=l 
     return cfg.wl
-
+def give_history():
+    if cfg.history==None:
+        try:
+            with open(history_file_name, "r") as jsonfile:
+                cfg.history = json.load(jsonfile) # Reading the file
+        except KeyError as e:  
+            print(f'Файл {history_file_name} з історією пошкоджений')  
+        except json.decoder.JSONDecodeError as e:
+            print(f'Файл {history_file_name} з історією пошкоджений')
+        except FileNotFoundError as e:
+            cfg.history=[]
+            with open(history_file_name, "w") as jsonfile:
+                json.dump(cfg.history, jsonfile)
+    return cfg.history
+def give_viewed_list():
+    if cfg.viewed==None:
+        try:
+            with open(viewed_file_name, "r") as jsonfile:
+                cfg.viewed = json.load(jsonfile) # Reading the file
+        except KeyError as e:  
+            print(f'Файл {viewed_file_name} з переглянутими тайтлами пошкоджений')  
+        except json.decoder.JSONDecodeError as e:
+            print(f'Файл {viewed_file_name} з переглянутими тайтлами пошкоджений')  
+        except FileNotFoundError as e:
+            cfg.viewed=[]
+            with open(viewed_file_name, "w") as jsonfile:
+                json.dump(cfg.viewed, jsonfile)
+    return cfg.viewed
+def add_in_history(taytl_var):
+    give_history()
+    tat={}
+    tat['name']=taytl_var.give_short_name()
+    tat['url']=taytl_var.url
+    for i in cfg.history:
+        if i['name']==tat['name']:
+            cfg.history.remove(i)
+            break
+    cfg.history.insert(0, tat)
+    if len(cfg.history) > 20:
+        del cfg.history[20:len(cfg.history)]
+    with open(history_file_name, "w") as jsonfile:
+        json.dump(cfg.history, jsonfile) 
+def add_in_viewed_list(taytl_var):
+    give_viewed_list()
+    tat={}
+    tat['name']=taytl_var.give_short_name()
+    tat['url']=taytl_var.url
+    for i in cfg.viewed:
+        if i['name']==tat['name']:
+            cfg.viewed.remove(i)
+            break
+    cfg.viewed.insert(0, tat)
+    with open(viewed_file_name, "w") as jsonfile:
+        json.dump(cfg.viewed, jsonfile)
 def test(): 
-    k=[1,2,3,4,5,6,7,8]
-    n=len(k)
-    done=1
-    dl=0
-    total_length=n
-    for i in range(n):
-        dl+=1
-        done = int(50 * dl / total_length)
-        sys.stdout.write(f"\r[%s%s] {i} {done}" % ('#' * done, '-' * (50-done)) )	
-        sys.stdout.flush()
-        
+    ur=''
+    tat=taytl_base('',name="Безумное погружение: Потерянное дитя / Deep Insanity: The Lost Child [1-11 из 12+]")
+    print(tat.giv_end_kl_ep())
     
 
 
 
 if __name__ == '__main__':
     print('Запустіть main.py')
-    #test()
+    # test()

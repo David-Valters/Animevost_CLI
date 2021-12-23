@@ -111,11 +111,12 @@ def download(list_down,taytl_var:taytl):
         inst.save_from(list_down,taytl_var.give_short_name())
     
 def menu_taytl(taytl_var: taytl):
+    add_in_history(taytl_var)
     while True:
         print_info_taytl(taytl_var)
-        print('\n[1/Enter] - вибрати епізоди\n[2] - додати в мої тайтли\n[3] - інші сезони цього тайтлу\n[4] - додаткова інформація(beta)\n[0] - назад\n> ',end='')
+        print('\n[1/Enter] - вибрати епізоди\n[2] - додати в мої тайтли\n[3] - додати в переглянуті\n[4] - інші сезони цього тайтлу\n[5] - додаткова інформація(beta)\n[0] - назад\n> ',end='')
         # list,taytl_var=choice_episod(taytl_var)
-        v=input_v(0,4,[''])
+        v=input_v(0,5,[''])
         if v==0:
             return
         elif v=='' or v==1 :
@@ -172,6 +173,9 @@ def menu_taytl(taytl_var: taytl):
             print('Добавлено')
             break
         elif v==3:
+            add_in_viewed_list(taytl_var)
+            print('Добавлено')
+        elif v==4:
             ll=taytl_var.give_all_taytl()
             if ll==None:
                 print('Немає інших сезонів')
@@ -183,7 +187,7 @@ def menu_taytl(taytl_var: taytl):
                 continue
             else:
                 taytl_var = taytl(taytl_var.give_all_taytl()[v-1].url)
-        elif v==4:
+        elif v==5:
             print(taytl_var.url)
 
 def playlist_def():
@@ -240,8 +244,8 @@ def main():
     cfg.my_wl= read_mylist()
     #-- 
     while 1:
-        print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Історія\n[8]-Налаштування\n[0]-Вийти\n> ',end='')
-        v=input_v(0,8)
+        print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Додатково\n[0]-Вийти\n> ',end='')
+        v=input_v(0,7)
         if v==1:
             list=giv_end_list_taytls(main_url)  
             print_taytl(list,max=k_ser)  
@@ -335,6 +339,7 @@ def main():
                         cop_wl=cfg.wl.copy()
                         for j in cop_wl:
                             taytl_var=taytl(j['url'])
+                            add_in_history(taytl_var)
                             taytl_var.set_list_episod()          
                             zahal_ep=taytl_var.list_ep
                             lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
@@ -368,7 +373,52 @@ def main():
                                 write_mylist()
                                 print(f'Видалено:\n- {name}\n')
                     elif v==2:
-                        print('В розробці')
+                        if cfg.my_wl==None:
+                            print('Відсутній список ваших тайтлів !')
+                            n=quesBool('Створити файл зі списком ?')
+                            if n:
+                                create_wl_list()
+                            else:
+                                continue
+                        print()
+                        if len(cfg.my_wl['list'])==0:
+                            print('Ви не добавили ні одного тайтла в "мої тайтли"')
+                            continue
+                        done=0
+                        dl=0
+                        total_length=len(cfg.my_wl['list'])  
+                        new_in_site=giv_end_list_taytls(main_url) 
+                        list_end=[]
+                        for i in cfg.my_wl['list']:
+                            dl+=1
+                            done = int(50 * dl / total_length)
+                            if len(i['name'])>40:
+                                print_name=i['name'][:37]+'...'
+                            else:
+                                print_name=i['name'].ljust(40)                                
+
+                            sys.stdout.write(f"\r[%s%s] {print_name}" % ('#' * done, '-' * (50-done)) )	
+                            sys.stdout.flush()
+                            o=None
+                            for j in new_in_site:
+                                if i['name']==j.give_short_name():
+                                    o=j
+                                    break
+                            if not o:
+                                o=taytl(i['url'])
+                            if o.giv_kl_ep()>=o.giv_end_kl_ep() and o.giv_kl_ep()!=0 :
+                                list_end.append(i)
+                                add_in_viewed_list(o)
+
+                        if len(list_end)==0:
+                            print('\nНемає тайтлів які завершились в вашому списку')
+                        else:                            
+                            print('\nОбробка...')
+                            for g in list_end:                                
+                                cfg.my_wl['list'].remove(g)
+                            write_mylist()        
+                            print_my_list(list_end,lambda x:x['name'])                            
+                            print('Ці тайтли видалені з "мої татйли" і переміщені в "Переглянуті"')
                     elif v==3:
                         count=len(cfg.my_wl['list'])
                         while True:
@@ -401,9 +451,38 @@ def main():
                     var=zagal[n-1]
                     menu_taytl(taytl(var.url))                
         elif v==7:
-            print('В розробці')
-        elif v==8:
-            print('В розробці')
+            print(f"\n[1] - Історія [2] - Переглянуті [3] - Налаштування(NONE) [0] - Назад > ",end="")
+            v=input_v(0,3)
+            if v==1:
+                hl=give_history()
+                if len(hl)>0:
+                    print_my_list(hl,lambda x:x['name'])
+                    print(f'Ведіть номер тайтла [1-{len(cfg.history)}] або [0] - Назад > ',end="")
+                    n=input_v(0,len(cfg.history))
+                    if n!=0:
+                        n-=1
+                        tay=cfg.history[n]
+                        tayt=taytl(tay['url'])
+                        menu_taytl(tayt)
+                else:
+                    print('\nВаша історія пуста')
+            elif v==2:
+                hl=give_viewed_list()
+                if len(hl)>0:
+                    print_my_list(hl,lambda x:x['name'])
+                    print(f'Ведіть номер тайтла [1-{len(cfg.viewed)}] або [0] - Назад > ',end="")
+                    n=input_v(0,len(cfg.viewed))
+                    if n!=0:
+                        n-=1
+                        tay=cfg.viewed[n]
+                        tayt=taytl(tay['url'])
+                        menu_taytl(tayt)
+                else:
+                    print('\nСписок переглянутих тайтлів пустий')
+            elif v==3:
+                print('В розробці')
+            else:
+                pass            
         elif v==0:
             print()
             return 0

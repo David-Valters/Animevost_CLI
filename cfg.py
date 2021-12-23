@@ -9,3 +9,5 @@ settings={
 }
 wl=[]
 end_taytl=[]
+history=None
+viewed=None
