@@ -316,10 +316,15 @@ def main():
             give_my_taytl()
             fll=True
             if len(cfg.wl)==0:
-                print('Немає нових серій')
+                print('\nНемає нових серій\n')
                 fll=False
             if fll:
-                print_my_list(cfg.wl,lambda x:f"{x['name']} - ({x['+']})")
+                print_my_list(cfg.wl,lambda x:f"{x['name']} - ({x['+']})")            
+            print('-----------# Тайтли які сьогодні вийдуть #-----------')
+            if len(cfg.f_wl)==0:
+                print('\nСьогодні нових серій не буде :(')
+            else:
+                print_my_list(cfg.f_wl,lambda x:x.name)
             while True:
                 if fll:
                     print('\n[1/Enter] - Завантажити\n[2] - None\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')

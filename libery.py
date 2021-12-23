@@ -391,6 +391,8 @@ def give_urls(taytl_var,start,end,yak):
 
 def give_my_taytl():
     l=giv_end_list_taytls(main_url)
+    raspis=give_raspis()[datetime.datetime.today().weekday()]
+    future_titles=[]
     new_in_site=[]
     if len(cfg.end_taytl)!=0:
         set_difference = set(l) - set(cfg.end_taytl)
@@ -436,10 +438,17 @@ def give_my_taytl():
                 if fl:
                     cfg.wl.append(cop)
             index+=1            
+
+        for g in raspis:
+            for c in cfg.my_wl['list']:
+                if g.give_short_name()==c['name']:
+                    future_titles.append(g)
+                    break
+        cfg.f_wl=future_titles
     print()
     print()
     cfg.end_taytl=l 
-    return cfg.wl
+    return cfg.wl,future_titles
 def give_history():
     if cfg.history==None:
         try:
@@ -495,9 +504,7 @@ def add_in_viewed_list(taytl_var):
     with open(viewed_file_name, "w") as jsonfile:
         json.dump(cfg.viewed, jsonfile)
 def test(): 
-    ur=''
-    tat=taytl_base('',name="Безумное погружение: Потерянное дитя / Deep Insanity: The Lost Child [1-11 из 12+]")
-    print(tat.giv_end_kl_ep())
+    pass
     
 
 
