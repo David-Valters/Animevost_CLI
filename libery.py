@@ -84,10 +84,11 @@ class taytl(taytl_base):
             e=i.split(':')
             e[0]=e[0][1:-1]
             e[1]=e[1][1:-1]
-            if re.fullmatch(r"^(?!0.*$)([0-9]{1,4} серия)",e[0]):
-                s.append(e)
-            else:
-                dop.append(e)
+            if e not in s and e not in dop:
+                if re.fullmatch(r"^(?!0.*$)([0-9]{1,4} серия)",e[0]):
+                    s.append(e)
+                else:
+                    dop.append(e)
         self.kl_ep=len(s)+len(dop)
         self.kl_dop_ep=len(dop)        
         self.list_ep=s  
@@ -158,7 +159,7 @@ def giv_end_list_taytls(url):#вертає список обєктів taytl
 
 def make_ep_url(kod:str,quality:int=720)->str:
     # global nom_payer
-    urls_player=[f"https://play.agorov.org/{kod}?old=1",f"https://play.animegost.org/{kod}?player=9"]
+    urls_player=[f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
     while True:
         r= requests.get(urls_player[cfg.nom_payer])
         if r.status_code!=200:
@@ -276,7 +277,8 @@ def is_taytl(url):
 def give_taytl_whits_page(url):
     r=requests.get(url)
     if r.status_code!=200:
-        print("Error conect to site(find video): "+str(r.status_code))
+        return None
+        print(f"\nError conect to site(find video): \n{url}\n"+str(r.status_code))
     soup=BeautifulSoup(r.content, 'html.parser')
     item=soup.find('div',id='dle-content')
     item=item.find_all('div',class_='shortstoryHead')
@@ -322,6 +324,8 @@ def give_search_list(req,all=False,stat_bar=False):
                 all_list.append(taytl(clear_url(i['link'])))
             else:
                 ll=give_taytl_whits_page(clear_url(i['link']))
+                if ll is None:
+                    continue
                 for j in ll:
                     print_name=j.name
                     # print('-',j)
@@ -504,11 +508,13 @@ def add_in_viewed_list(taytl_var):
     with open(viewed_file_name, "w") as jsonfile:
         json.dump(cfg.viewed, jsonfile)
 def test(): 
-    pass
-    
+    v = taytl('https://animevost.org/tip/tv/2536-attack-on-titan-the-final-season.html')
+    k=v.giv_kl_ep()
+    print(k)
+    print(v.kl_ep)
 
 
 
 if __name__ == '__main__':
-    print('Запустіть main.py')
-    # test()
+    # print('Запустіть main.py')
+    test()

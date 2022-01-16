@@ -8,6 +8,7 @@ settings={
 	'allchek':False
 }
 wl=[]
+f_wl=[]
 end_taytl=[]
 history=None
 viewed=None
