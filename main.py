@@ -161,15 +161,17 @@ def menu_taytl(taytl_var: taytl):
             tat['name']=name
             tat['url']=taytl_var.url
             if taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep>1:
-                print(f'Введіть номер останньої серії яку ви переглядали [1-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія > ',end='')
-                n=input_v(1,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,[''])
-                if n=='':
-                    tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
-                else:
-                    tat['ep']=n
+                print(f'Введіть номер останньої серії яку ви переглядали [0-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія [-] - Назад > ',end='')
+                n=input_v(0,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,['','-'])
+                if n!='-':    
+                    if n=='':
+                        tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
+                    else:
+                        tat['ep']=n
             else:
                 tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
             add_taytl_in_wl(tat)
+            cfg.end_taytl=[]
             print('Добавлено')
             break
         elif v==3:
@@ -375,6 +377,7 @@ def main():
                             else:
                                 name=cfg.my_wl['list'][v-1]['name']
                                 cfg.my_wl['list'].pop(v-1)
+                                cfg.end_taytl=[]
                                 write_mylist()
                                 print(f'Видалено:\n- {name}\n')
                     elif v==2:
@@ -434,7 +437,8 @@ def main():
                             if v==0:
                                 break
                             else:
-                                edit_num_ep(v-1)                       
+                                edit_num_ep(v-1)   
+                            cfg.end_taytl=[]                    
         elif v==5:
             playlist_def()
         elif v==6:
