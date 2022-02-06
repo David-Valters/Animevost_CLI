@@ -278,7 +278,7 @@ def main():
             while 1 :
                 if not full:
                     req=input('(Введіть назву) або [0] - вийти > ')
-                    if v=='0':
+                    if req=='0':
                         break
                 search=give_search_list(req,full,True)
                 full=False

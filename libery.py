@@ -34,8 +34,10 @@ class taytl_base:
             return self.short_name
         else:
             i1=self.name.find('~')
-            if i1!=-1:
-                return self.name[:i1-1]
+            if i1!=-1:                
+                while self.name[i1-1]==' ' or self.name[i1-1]=='~':
+                    i1-=1                               
+                return self.name[:i1]
             else:
                 return self.name[:self.name.find('/')][:-1]
     def giv_kl_ep(self):
@@ -393,11 +395,14 @@ def give_urls(taytl_var,start,end,yak):
     lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],yak)] for i in range(start,end+1)]
     return lll
 
-def give_my_taytl():
+def give_my_taytl():#TODO -
     l=giv_end_list_taytls(main_url)
     raspis=give_raspis()[datetime.datetime.today().weekday()]
+    # for i in range(len(raspis)):
+    #     j=raspis[i].name.find('~')
+    #     raspis[i].name=raspis[i].name[:j-2]
     future_titles=[]
-    new_in_site=[]
+    new_in_site=[]    
     if len(cfg.end_taytl)!=0:
         set_difference = set(l) - set(cfg.end_taytl)
         new_in_site = list(set_difference)      
@@ -416,7 +421,8 @@ def give_my_taytl():
             sys.stdout.flush()
             o=None
             for j in new_in_site:
-                if i['name']==j.give_short_name():
+                qqq=j.give_short_name()
+                if i['name']==qqq:
                     o=j
                     break
             if not o:
@@ -445,7 +451,8 @@ def give_my_taytl():
 
         for g in raspis:
             for c in cfg.my_wl['list']:
-                if g.give_short_name()==c['name']:
+                www=g.give_short_name()
+                if www==c['name']:
                     future_titles.append(g)
                     break
         cfg.f_wl=future_titles
@@ -507,14 +514,16 @@ def add_in_viewed_list(taytl_var):
     cfg.viewed.insert(0, tat)
     with open(viewed_file_name, "w") as jsonfile:
         json.dump(cfg.viewed, jsonfile)
-def test(): 
-    v = taytl('https://animevost.org/tip/tv/2536-attack-on-titan-the-final-season.html')
-    k=v.giv_kl_ep()
-    print(k)
-    print(v.kl_ep)
+def test():
+    w='Руководство гениального принца по вызволению страны из долгов  ~ (18:30)'
+    print(w[:-1])
+    # v = taytl('https://animevost.org/tip/tv/2536-attack-on-titan-the-final-season.html')
+    # k=v.giv_kl_ep()
+    # print(k)
+    # print(v.kl_ep)
 
 
 
 if __name__ == '__main__':
-    # print('Запустіть main.py')
-    test()
+    print('Запустіть main.py')
+    # test()
