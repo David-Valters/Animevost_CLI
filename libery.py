@@ -161,7 +161,7 @@ def giv_end_list_taytls(url):#вертає список обєктів taytl
 
 def make_ep_url(kod:str,quality:int=720)->str:
     # global nom_payer
-    urls_player=[f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
+    urls_player=[f"https://animevost.org/frame5.php?play={kod}&player=9",f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
     while True:
         r= requests.get(urls_player[cfg.nom_payer])
         if r.status_code!=200:
