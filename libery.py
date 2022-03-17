@@ -161,7 +161,9 @@ def giv_end_list_taytls(url):#вертає список обєктів taytl
 
 def make_ep_url(kod:str,quality:int=720)->str:
     # global nom_payer
+    
     urls_player=[f"https://animevost.org/frame5.php?play={kod}&player=9",f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
+    # print(urls_player)
     while True:
         r= requests.get(urls_player[cfg.nom_payer])
         if r.status_code!=200:
@@ -174,8 +176,23 @@ def make_ep_url(kod:str,quality:int=720)->str:
                 cfg.nom_payer=+1
         else:
             break
+    # print(r.text)
     soup=BeautifulSoup(r.content, 'html.parser')
-    items = soup.findAll('a',class_="butt")
+
+    # a=soup.find('a')
+    # # print(a)
+    # if a==None:
+    #     m=r.text
+    #     i1=m.find('[HD (720р)]')
+    #     i2=m.find(' ',i1+10)
+    #     a=m[i1+11:i2]
+    # else:
+    #     a=a['href']
+
+    # return a
+    #download="invoice"
+    # it=soup.find()
+    items = soup.findAll('a',class_="butt")#old
 
     if quality==480:
         return items[0]["href"]
