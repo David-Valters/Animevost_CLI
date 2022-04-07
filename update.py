@@ -23,12 +23,13 @@ def give_list_file():
 def isactual()->bool:
     try:
         response=requests.get(url_ver)
+        jsonResponse = response.json()
+        response.close()
+        return jsonResponse[0]['name']==ver
     except requests.ConnectionError as e:
         print('Не вдалось провірити актуальність програми')
         print('МОЖЛИВО У ВАС ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ')
         return True
-    jsonResponse = response.json()
-    return jsonResponse[0]['name']==ver
 
 def update(prin=1): 
     if prin:

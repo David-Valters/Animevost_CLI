@@ -143,7 +143,7 @@ def menu_taytl(taytl_var: taytl):
                 print('Відсутній список ваших тайтлів !')
                 n=quesBool('Створити файл зі списком ?')
                 if n:
-                    cfg.my_wl=create_wl_list()
+                    create_wl_list()
                 else:
                     return None
             name=taytl_var.give_short_name()
@@ -160,7 +160,7 @@ def menu_taytl(taytl_var: taytl):
             tat={}
             tat['name']=name
             tat['url']=taytl_var.url
-            if taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep>1:
+            if taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep>0:
                 print(f'Введіть номер останньої серії яку ви переглядали [0-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія [-] - Назад > ',end='')
                 n=input_v(0,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,['','-'])
                 if n!='-':    
@@ -168,8 +168,6 @@ def menu_taytl(taytl_var: taytl):
                         tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
                     else:
                         tat['ep']=n
-            else:
-                tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
             add_taytl_in_wl(tat)
             cfg.end_taytl=[]
             print('Добавлено')
