@@ -84,8 +84,8 @@ class taytl(taytl_base):
         
         for i in sps:
             e=i.split(':')
-            e[0]=e[0][1:-1]
-            e[1]=e[1][1:-1]
+            e[0]=e[0].replace('"','')
+            e[1]=e[1].replace('"','')
             if e not in s and e not in dop:
                 if re.fullmatch(r"^(?!0.*$)([0-9]{1,4} серия)",e[0]):
                     s.append(e)
