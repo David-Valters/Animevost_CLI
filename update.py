@@ -5,11 +5,8 @@ import os
 import libery
 
 ver='v1.2.5'
-url_ver='https://api.github.com/repos/David-Valters/Animevost_CLI/releases'
+url_ver='https://raw.githubusercontent.com/David-Valters/Animevost_CLI/main/update.py'
 url_file_list='https://api.github.com/repos/David-Valters/Animevost_CLI/git/trees/main?recursive=1'
-
-
-
 
 
 def give_list_file():
@@ -22,10 +19,14 @@ def give_list_file():
 
 def isactual()->bool:
     try:
-        response=requests.get(url_ver)
-        jsonResponse = response.json()
-        response.close()
-        return jsonResponse[0]['name']==ver
+        r=requests.get(url_ver, headers={'User-Agent': ''})
+        data=r.text
+        f1="ver='"
+        i1=data.find(f1)
+        i1+=+len(f1)
+        i2=data.find("'",i1)
+        global_ver=data[i1:i2]        
+        return ver==global_ver
     except requests.ConnectionError as e:
         print('Не вдалось провірити актуальність програми')
         print('МОЖЛИВО У ВАС ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ')
@@ -44,11 +45,11 @@ def update(prin=1):
     if prin:
         print('Файли програми оновлені')
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     stan=isactual()
     if stan:
-        print('Програма актуальна')
-        v=libery.quesBool('Обновити файли ?',0)
+        print('Версія програми сама нова')
+        v=libery.quesBool('Всеодно обновити файли ?',0)
         if v:
             update()
     else:
