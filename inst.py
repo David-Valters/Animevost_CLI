@@ -21,7 +21,7 @@ def convert_size(size_bytes,write_type=1):
 
 def down(file_name,path,url):
     with open(path, "wb") as f:
-        response = requests.get(url, stream=True)
+        response = requests.get(url, stream=True, headers={'User-Agent': ''})
         if response.status_code!=200:
                 print("Error conect to player: "+str(response.status_code))
                 return None
