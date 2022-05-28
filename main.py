@@ -348,7 +348,9 @@ def main():
                             taytl_var.set_list_episod()          
                             zahal_ep=taytl_var.list_ep
                             lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
-                            inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
+                            stan=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
+                            if not stan:
+                                continue
                             cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
                             cfg.wl.remove(j)
                             write_mylist()
@@ -358,7 +360,7 @@ def main():
                 elif v==2:
                     print('В розробці')
                 elif v==3:
-                    print('\n[1] - Видалити по номеру\n[2] - Видалити тайтли які вже завершились\n[3] - Змінити номер номер останньої серії\n[0] - Назад\n> ',end='')
+                    print('\n[1] - Видалити по номеру\n[2] - Видалити тайтли які вже завершились\n[3] - Змінити номер останньої серії\n[0] - Назад\n> ',end='')
                     v=input_v(0,3)
                     if v==1:
                         while True:

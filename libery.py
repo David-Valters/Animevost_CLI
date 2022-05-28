@@ -159,11 +159,8 @@ def giv_end_list_taytls(url):#вертає список обєктів taytl
         s.append(taytl_base(i['href'],i.text))
     return s
 
-def make_ep_url(kod:str,quality:int=720)->str:
-    # global nom_payer
-    
+def make_ep_url(kod:str,quality:int=720)->str:   
     urls_player=[f"https://animevost.org/frame5.php?play={kod}&player=9",f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
-    # print(urls_player)
     while True:
         r= requests.get(urls_player[cfg.nom_payer])
         if r.status_code!=200:
@@ -176,22 +173,7 @@ def make_ep_url(kod:str,quality:int=720)->str:
                 cfg.nom_payer=+1
         else:
             break
-    # print(r.text)
     soup=BeautifulSoup(r.content, 'html.parser')
-
-    # a=soup.find('a')
-    # # print(a)
-    # if a==None:
-    #     m=r.text
-    #     i1=m.find('[HD (720р)]')
-    #     i2=m.find(' ',i1+10)
-    #     a=m[i1+11:i2]
-    # else:
-    #     a=a['href']
-
-    # return a
-    #download="invoice"
-    # it=soup.find()
     items = soup.findAll('a',class_="butt")#old
 
     if quality==480:
@@ -254,6 +236,7 @@ def get_script_dir(follow_symlinks=True):
     if follow_symlinks:
         path = os.path.realpath(path)
     return os.path.dirname(path)
+
 def print_taytl(list,min=0,max=None):
     print()
     if max==None:
@@ -286,12 +269,6 @@ def is_taytl(url):
         return True
     else:
         return False
-    # if url.find('page')!=-1:
-    #     return False 
-    # if url.find('tip')!=-1:
-    #     return True
-    # else:
-    #     return False
 
 def give_taytl_whits_page(url):
     r=requests.get(url)
@@ -306,9 +283,8 @@ def give_taytl_whits_page(url):
         i=i.find('h2')
         i=i.find('a')
         ll.append(taytl_base(i['href'],i.text))
-        # ll.append(i['href'])
-        # print(i.text)
     return ll
+
 def clear_url(url):
     lis=['dev.']
     i1=url.find(lis[0])
@@ -334,7 +310,6 @@ def give_search_list(req,all=False,stat_bar=False):
         dl=0
         total_length=len(vd)
         for i in vd:
-            # print(i['link'])
             done = int(50 * dl / total_length)
             if stat_bar:
                 sys.stdout.write(f"\r[%s%s]  {print_name[:60]}... " % ('#' * done, '-' * (50-done)) )	
@@ -347,7 +322,6 @@ def give_search_list(req,all=False,stat_bar=False):
                     continue
                 for j in ll:
                     print_name=j.name
-                    # print('-',j)
                 all_list=all_list+ll
             dl+=1        
         return all_list
@@ -392,6 +366,7 @@ def print_my_list(my_list,my_def,start=1):
         print(f'[{k}]',my_def(i))
         k+=1
     print()
+
 def give_raspis():
     r=requests.get(main_url)
     soup=BeautifulSoup(r.content, 'html.parser')
@@ -412,12 +387,9 @@ def give_urls(taytl_var,start,end,yak):
     lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],yak)] for i in range(start,end+1)]
     return lll
 
-def give_my_taytl():#TODO -
+def give_my_taytl():
     l=giv_end_list_taytls(main_url)
     raspis=give_raspis()[datetime.datetime.today().weekday()]
-    # for i in range(len(raspis)):
-    #     j=raspis[i].name.find('~')
-    #     raspis[i].name=raspis[i].name[:j-2]
     future_titles=[]
     new_in_site=[]    
     if len(cfg.end_taytl)!=0:
@@ -465,7 +437,6 @@ def give_my_taytl():#TODO -
                 if fl:
                     cfg.wl.append(cop)
             index+=1            
-
         for g in raspis:
             for c in cfg.my_wl['list']:
                 www=g.give_short_name()
@@ -477,6 +448,7 @@ def give_my_taytl():#TODO -
     print()
     cfg.end_taytl=l 
     return cfg.wl,future_titles
+
 def give_history():
     if cfg.history==None:
         try:
@@ -491,6 +463,7 @@ def give_history():
             with open(history_file_name, "w") as jsonfile:
                 json.dump(cfg.history, jsonfile)
     return cfg.history
+
 def give_viewed_list():
     if cfg.viewed==None:
         try:
@@ -505,6 +478,7 @@ def give_viewed_list():
             with open(viewed_file_name, "w") as jsonfile:
                 json.dump(cfg.viewed, jsonfile)
     return cfg.viewed
+
 def add_in_history(taytl_var):
     give_history()
     tat={}
@@ -531,15 +505,9 @@ def add_in_viewed_list(taytl_var):
     cfg.viewed.insert(0, tat)
     with open(viewed_file_name, "w") as jsonfile:
         json.dump(cfg.viewed, jsonfile)
+
 def test():
-    w='Руководство гениального принца по вызволению страны из долгов  ~ (18:30)'
-    print(w[:-1])
-    # v = taytl('https://animevost.org/tip/tv/2536-attack-on-titan-the-final-season.html')
-    # k=v.giv_kl_ep()
-    # print(k)
-    # print(v.kl_ep)
-
-
+    pass
 
 if __name__ == '__main__':
     print('Запустіть main.py')

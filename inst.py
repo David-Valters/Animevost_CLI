@@ -23,7 +23,7 @@ def down(file_name,path,url):
     with open(path, "wb") as f:
         response = requests.get(url, stream=True, headers={'User-Agent': ''})
         if response.status_code!=200:
-                print("Error conect to player: "+str(response.status_code))
+                print("Error download episod: "+str(response.status_code))
                 return None
         print("Downloading %s" % file_name)
         total_length = response.headers.get('content-length')
@@ -43,8 +43,10 @@ def down(file_name,path,url):
                 sys.stdout.write(f"\r[%s%s] {(lambda dl: status if dl!=total_length else finish    )(dl)}   " % ('#' * done, '-' * (50-done)) )	
                 sys.stdout.flush()
             print()
+    return True
 
 def save_from(listt,name,path="",trow=False):
+    stan=False
     try:
         name=name.replace('\n', '')
         for i in lb:
@@ -66,19 +68,20 @@ def save_from(listt,name,path="",trow=False):
         print(path)
         for l in listt:
             url=l[1]
-            name_file=l[0]
-            
-            
-            #print("Start write "+str(name_file))
+            name_file=l[0]            
             
             path_name=os.path.join(path,name_file+" "+dop_info+".mp4")
-            
-            down(name_file,path_name,url)	
+            stan=down(name_file,path_name,url)	
     except KeyboardInterrupt:
         if trow:
             raise KeyboardInterrupt
         else:
-            print("\nЗавантаження перервано")	
+            print("\nЗавантаження перервано")
+    except requests.exceptions.RequestException as e:
+        print('Проблема з посиланням для завантаження')
+        print(e)	
+    finally:
+        return stan
 
 def main():
     print('Запустіть main.py')
