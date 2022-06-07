@@ -247,7 +247,9 @@ def main():
         print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Додатково\n[0]-Вийти\n> ',end='')
         v=input_v(0,7)
         if v==1:
-            list=giv_end_list_taytls(main_url)  
+            list=giv_end_list_taytls(main_url)
+            if list==None:
+                continue  
             print_taytl(list,max=k_ser)  
             flag=True       
             while flag:

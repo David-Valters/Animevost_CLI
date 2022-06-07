@@ -154,6 +154,8 @@ def giv_end_taytls(url):# вертає html з даними про остані 
     
 def giv_end_list_taytls(url):#вертає список обєктів taytl
     el=giv_end_taytls(url)
+    if el==None:
+        return None
     s=[]
     for i in el:
         s.append(taytl_base(i['href'],i.text))
