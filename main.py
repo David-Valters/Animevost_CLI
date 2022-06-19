@@ -168,6 +168,10 @@ def menu_taytl(taytl_var: taytl):
                         tat['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
                     else:
                         tat['ep']=n
+                else:
+                    break
+            else:
+                tat['ep']=0
             add_taytl_in_wl(tat)
             cfg.end_taytl=[]
             print('Добавлено')
