@@ -16,6 +16,7 @@ try:
     import update
 except ImportError as e:
         print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt'")
+        exit()
 def input_v(min:int,maxx:int=None,list=[])->int:
     while True:
         try:
