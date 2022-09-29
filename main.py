@@ -414,6 +414,8 @@ def main():
 
                             sys.stdout.write(f"\r[%s%s] {print_name}" % ('#' * done, '-' * (50-done)) )	
                             sys.stdout.flush()
+                            if i["ep"]==0:
+                                continue
                             o=None
                             for j in new_in_site:
                                 if i['name']==j.give_short_name():
