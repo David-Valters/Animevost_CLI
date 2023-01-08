@@ -229,8 +229,8 @@ def playlist_def():
             break
 def edit_num_ep(num):
     taytl_var=taytl(cfg.my_wl['list'][num]['url'])
-    print(f'Введіть номер останньої серії яку ви переглядали [1-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія > ',end='')
-    n=input_v(1,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,[''])
+    print(f'Введіть номер останньої серії яку ви переглядали [0-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - остання серія > ',end='')
+    n=input_v(0,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,[''])
 
     if n=='':
         cfg.my_wl['list'][num]['ep']=taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep
