@@ -161,7 +161,7 @@ def giv_end_list_taytls(url):#вертає список обєктів taytl
         s.append(taytl_base(i['href'],i.text))
     return s
 
-def make_ep_url(kod:str,quality:int=720)->str:   
+def old_make_ep_url(kod:str,quality:int=720)->str:   
     urls_player=[f"https://animevost.org/frame5.php?play={kod}&player=9",f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
     while True:
         r= requests.get(urls_player[cfg.nom_payer])
@@ -185,6 +185,9 @@ def make_ep_url(kod:str,quality:int=720)->str:
     else:
         print('Немає такої якості')
         return None
+
+def make_ep_url(kod:str,quality:int=720)->str:       
+    return f"http://video.animetop.info/{quality}/{kod}.mp4"
 
 def get_source(url):#search def
     try:

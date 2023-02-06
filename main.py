@@ -1,7 +1,7 @@
 from math import trunc
 from os import name
 from typing import Counter
-
+import subprocess
 
 print('start program')
 #cls; python main.py
@@ -15,7 +15,7 @@ try:
     import traceback  #інформація про помилки
     import update
 except ImportError as e:
-        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt'")
+        print("Помилка імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt'")
         exit()
 def input_v(min:int,maxx:int=None,list=[])->int:
     while True:
@@ -109,7 +109,61 @@ def choice_episod(taytl_var: taytl):
                 print('Не коректне введення!')
 
 def download(list_down,taytl_var:taytl):
-        inst.save_from(list_down,taytl_var.give_short_name())
+    inst.save_from(list_down,taytl_var.give_short_name())
+
+def download_wget(listt,name,path="",trow=False):
+    isGood=False
+    try:
+        name=name.replace('\n', '')
+        for i in inst.lb:
+            if(name.find(i)!=-1):
+                name=name.replace(i, '')
+        finish_name=""
+        if cfg.settings['addName']==True:
+            finish_name=name
+
+        
+        if (inst.get_str_size(name)<=inst.MAX_NAME_SIZE):
+            folder_name=name
+        else:
+            folder_name=inst.get_shortened_name(name, inst.MAX_NAME_SIZE)
+
+        if path=='':
+            #path=os.getcwd()+("/Download/"+name)
+            path=os.path.join(os.getcwd(),"Download",folder_name)
+        else:
+            path=os.path.join(path)
+        
+        if not os.path.exists(path):
+            os.makedirs(path)
+            
+        if (inst.get_str_size(finish_name)>inst.MAX_NAME_SIZE-4):
+            finish_name=inst.get_shortened_name(finish_name, inst.MAX_NAME_SIZE-5-inst.get_str_size(listt[-1][0]))            
+        for l in listt:
+            url=l[1]
+            episode_number=l[0]                     
+            name_file=episode_number+" "+finish_name+".mp4"
+            try:
+                final_path=os.path.join(path,name_file)
+                statis_code=subprocess.call(('wget',"-ct","0", "-O",final_path,url))
+            except OSError as exc:
+                print('OS ERROR')
+        if statis_code==0:	
+            isGood=True
+    except KeyboardInterrupt:
+        if trow:
+            raise KeyboardInterrupt
+        else:
+            print("\nЗавантаження перервано")
+    except FileNotFoundError:
+        print("Програму Wget не знайдено")
+    except requests.exceptions.RequestException as e:
+        print('Проблема з посиланням для завантаження')
+        print(e)
+    finally:
+        return isGood
+
+    
     
 def menu_taytl(taytl_var: taytl):
     add_in_history(taytl_var)
@@ -127,12 +181,15 @@ def menu_taytl(taytl_var: taytl):
             list_down=choice_episod(taytl_var)
             if list_down==None:
                 return
-            print('\n[1/Enter] - завантажити [2]-добавити в плейліст [0]-назад > ',end='')
-            v=input_v(0,2,[''])
+            print('\n[1/Enter] - завантажити [2]-завантажити через wget [3]-добавити в плейліст [0]-назад > ',end='')
+            v=input_v(0,3,[''])
             if v==''or v==1:
                 download(list_down,taytl_var)
                 break
             elif v==2:
+                download_wget(list_down, taytl_var.give_short_name())
+                break
+            elif v==3:
                 playlist.append([taytl_var,list_down])
                 break
             elif v==0:
@@ -334,7 +391,7 @@ def main():
                 print_my_list(cfg.f_wl,lambda x:x.name)
             while True:
                 if fll:
-                    print('\n[1/Enter] - Завантажити\n[2] - None\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
+                    print('\n[1/Enter] - Завантажити\n[2] - Завантажити через wget\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
                 else:
                     print('\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
                 if fll:
@@ -365,7 +422,24 @@ def main():
                     except KeyboardInterrupt:
                         print("\nЗавантаження перервано")
                 elif v==2:
-                    print('В розробці')
+                    print("Завантаження даних...")
+                    name_folder=datetime.datetime.today().strftime("%d.%m.%Y")
+                    name_folder=os.path.join(os.getcwd(),"Download","My taytls",name_folder)
+                    cop_wl=cfg.wl.copy()
+                    for j in cop_wl:
+                        taytl_var=taytl(j['url'])
+                        add_in_history(taytl_var)
+                        taytl_var.set_list_episod()          
+                        zahal_ep=taytl_var.list_ep
+                        lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
+                        # isGood=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
+                        isGood=download_wget(lll, taytl_var.give_short_name(), name_folder,True)
+                        if not isGood:
+                            continue
+                        cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
+                        cfg.wl.remove(j)
+                        write_mylist()
+                    break
                 elif v==3:
                     print('\n[1] - Видалити по номеру\n[2] - Видалити тайтли які вже завершились\n[3] - Змінити номер останньої серії\n[0] - Назад\n> ',end='')
                     v=input_v(0,3)
@@ -530,7 +604,7 @@ if __name__ == '__main__':
         ex_cod=main()
     except ImportError as e:
         print(' ')
-        print("Помилкаа імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможt то примусовов обновіть файли 'python update.py'")
+        print("Помилка імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможt то примусовов обновіть файли 'python update.py'")
     except requests.ConnectionError as e:
         print("OOPS!! Помилка з'єднання. Переконайтеся, що ви підключені до Інтернету.\n")
         print(str(e))			       
