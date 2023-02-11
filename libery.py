@@ -51,7 +51,12 @@ class taytl_base:
         if i1==-1:
             return 1
         i2=name.find(' ',i1)
-        return int(name[i1+1:i2])
+        try:
+            kl=int(name[i1+1:i2])
+        except ValueError:# на випадок якщо не вийде дізнатись кількість серій
+            kl=0
+        return kl
+        
     def giv_end_kl_ep(self)->int:
         name=self.name
         i1=name.find('[')

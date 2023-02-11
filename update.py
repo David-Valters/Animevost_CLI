@@ -1,10 +1,9 @@
 import requests
 import os
-# import sys
 
 import libery
 
-ver='v1.3.0'
+ver='v1.3.1'
 url_ver='https://raw.githubusercontent.com/David-Valters/Animevost_CLI/main/update.py'
 url_file_list='https://api.github.com/repos/David-Valters/Animevost_CLI/git/trees/main?recursive=1'
 
