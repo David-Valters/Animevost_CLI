@@ -275,10 +275,13 @@ def quesBool(text,priority=1):
         return False
 
 def is_taytl(url):
-    if url.find('.html')!=-1:
-        return True
-    else:
+    if url.find('.html')==-1:
         return False
+    elif url.find('page')!=-1:
+        return False
+    else:
+        return True
+        
 
 def give_taytl_whits_page(url):
     r=requests.get(url)
