@@ -192,6 +192,9 @@ def old_make_ep_url(kod:str,quality:int=720)->str:
         return None
 
 def make_ep_url(kod:str,quality:int=720)->str:       
+    if cfg.settings['NoAPIDownload']:
+        return old_make_ep_url(kod,quality)
+        
     return f"http://video.animetop.info/{quality}/{kod}.mp4"
 
 def get_source(url):#search def
