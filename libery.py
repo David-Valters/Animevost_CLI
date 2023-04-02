@@ -286,8 +286,9 @@ def is_taytl(url):
         return True
         
 
-def give_taytl_whits_page(url):
-    r=requests.get(url)
+def give_taytl_whits_page(url,r=None):
+    if r==None:
+        r=requests.get(url)
     if r.status_code!=200:
         return None
         print(f"\nError conect to site(find video): \n{url}\n"+str(r.status_code))
@@ -330,10 +331,13 @@ def give_search_list(req,all=False,stat_bar=False):
             if stat_bar:
                 sys.stdout.write(f"\r[%s%s]  {print_name[:60]}... " % ('#' * done, '-' * (50-done)) )	
                 sys.stdout.flush()
-            if is_taytl(clear_url(clear_url(i['link']))):
-                all_list.append(taytl(clear_url(i['link'])))
+            clean_link=clear_url(clear_url(i['link']))
+            r=requests.get(clean_link)
+            clean_link=r.url
+            if is_taytl(clean_link):
+                all_list.append(taytl(clean_link,r=r))
             else:
-                ll=give_taytl_whits_page(clear_url(i['link']))
+                ll=give_taytl_whits_page(clean_link,r=r)
                 if ll is None:
                     continue
                 for j in ll:
