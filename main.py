@@ -145,11 +145,16 @@ def download_wget(listt,name,path="",trow=False):
             name_file=episode_number+" "+finish_name+".mp4"
             try:
                 final_path=os.path.join(path,name_file)
-                statis_code=subprocess.call(('wget',"-ct","0", "-O",final_path,url))
+                print(name_file)
+                statis_code=subprocess.call(('wget',"-ct","0","-q","--show-progress" ,"-O",final_path,url))
             except OSError as exc:
                 print('OS ERROR')
         if statis_code==0:	
             isGood=True
+        elif statis_code==8:
+            print("Сервер видав відповідь про помилку, cпробуйте встановити параметру NoAPIDownload значення True")
+        else:
+            print(f"Помилка wget: {statis_code}")
     except KeyboardInterrupt:
         if trow:
             raise KeyboardInterrupt
