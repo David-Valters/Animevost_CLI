@@ -267,7 +267,7 @@ def playlist_def():
         for i in range(0,size):
             print(f'[{i+1}] '+playlist[i][0].name)
         print()
-        print('[1/Enter] - Завантажити [2] - None [3]- Очистити плейліст [4]-Видалити один елемент [0] - Назад > ',end='')
+        print('[1/Enter] - Завантажити [2] - Завантажити через wget [3]- Очистити плейліст [4]-Видалити один елемент [0] - Назад > ',end='')
         v=input_v(0,5,[''])
         if v==''or v==1:
             for i in playlist:
@@ -275,7 +275,14 @@ def playlist_def():
             playlist.clear()
             break
         elif v==2:
-            print('В розробці')#vlc
+            for i in playlist:
+                # download(i[1],i[0])
+                isGood=download_wget(i[1],i[0].give_short_name())
+                pass
+                if not isGood:
+                    continue
+                playlist.pop(0)
+            break
         elif v==3:
             playlist.clear()
             break
@@ -284,8 +291,10 @@ def playlist_def():
             for i in range(0,size):
                 print(f'[{i+1}] '+playlist[i][0].name)
             print()
-            print(f'Введіть номер елемента [1-{size}] > ',end='')
-            v=input_v(1,size)
+            print(f'Введіть номер елемента [1-{size}] [0]-скасувати> ',end='')
+            v=input_v(0,size)
+            if v==0:
+                continue
             playlist.pop(v-1)
         elif v==0:
             break
@@ -413,7 +422,7 @@ def main():
                         cop_wl=cfg.wl.copy()
                         for j in cop_wl:
                             taytl_var=taytl(j['url'])
-                            add_in_history(taytl_var)
+                            add_in_history(taytl_var, j['ep'])
                             taytl_var.set_list_episod()          
                             zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
                             lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
@@ -433,7 +442,7 @@ def main():
                     cop_wl=cfg.wl.copy()
                     for j in cop_wl:
                         taytl_var=taytl(j['url'])
-                        add_in_history(taytl_var)
+                        add_in_history(taytl_var, j['ep'])
                         taytl_var.set_list_episod()          
                         zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
                         lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]

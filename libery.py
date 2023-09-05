@@ -502,11 +502,13 @@ def give_viewed_list():
                 json.dump(cfg.viewed, jsonfile)
     return cfg.viewed
 
-def add_in_history(taytl_var):
+def add_in_history(taytl_var,episod = None):
     give_history()
     tat={}
     tat['name']=taytl_var.give_short_name()
     tat['url']=taytl_var.url
+    if episod:
+        tat["ep"] = episod
     for i in cfg.history:
         if i['name']==tat['name']:
             cfg.history.remove(i)
