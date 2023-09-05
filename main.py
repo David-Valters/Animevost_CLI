@@ -224,7 +224,7 @@ def menu_taytl(taytl_var: taytl):
             tat['name']=name
             tat['url']=taytl_var.url
             if taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep>0:
-                print(f'Введіть номер останньої серії яку ви переглядали [0-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - останої серія [-] - Назад > ',end='')
+                print(f'Введіть номер останньої серії яку ви переглядали [0-{taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep}]\nабо [Enter] - остання серія [-] - Назад > ',end='')
                 n=input_v(0,taytl_var.giv_kl_ep()-taytl_var.kl_dop_ep,['','-'])
                 if n!='-':    
                     if n=='':

@@ -1,16 +1,19 @@
-import os
-import sys
-import inspect
-from typing import List
-# from requests.models import parse_url
-from requests_html import HTMLSession #для пошуку
-import requests
-import re # регулярки
-from bs4 import BeautifulSoup # парсинг сторіки
-import cfg
-from collections import OrderedDict
-import json
-import datetime
+try:
+    import os
+    import sys
+    import inspect
+    from typing import List
+    # from requests.models import parse_url
+    import requests
+    import re # регулярки
+    import cfg
+    from collections import OrderedDict
+    import json
+    import datetime
+    from bs4 import BeautifulSoup # парсинг сторіки
+    from requests_html import HTMLSession #для пошуку
+except ImportError as e:
+    print(f"Помилка імпорту {e}")
 
 main_url='https://animevost.org'
 
@@ -509,10 +512,11 @@ def add_in_history(taytl_var):
             cfg.history.remove(i)
             break
     cfg.history.insert(0, tat)
-    if len(cfg.history) > 20:
-        del cfg.history[20:len(cfg.history)]
+    if len(cfg.history) > 40:
+        del cfg.history[40:len(cfg.history)]
     with open(history_file_name, "w") as jsonfile:
         json.dump(cfg.history, jsonfile) 
+
 def add_in_viewed_list(taytl_var):
     give_viewed_list()
     tat={}
