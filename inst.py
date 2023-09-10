@@ -60,7 +60,7 @@ def down(episode_number, name_file, folder_path, url):
                 done = int(50 * dl / total_length)
                 status=f"{convert_size(dl)}/{convert_size(total_length)}"
 
-                sys.stdout.write(f"\r[%s%s] {(lambda dl: status if dl!=total_length else finish    )(dl)}   " % ('#' * done, '-' * (50-done)) )	
+                sys.stdout.write(f"\r[%s%s] {(lambda dl: status if dl!=total_length else finish)(dl)}   " % ('#' * done, '-' * (50-done)) )	
                 sys.stdout.flush()
             print()
     return True
@@ -74,7 +74,7 @@ def save_from(listt,name,path="",trow=False):
             if(name.find(i)!=-1):
                 name=name.replace(i, '')
         finish_name=""
-        if cfg.settings['addName']==True:
+        if cfg.settings['addName'] is True:
             finish_name=name
 
 
@@ -101,7 +101,7 @@ def save_from(listt,name,path="",trow=False):
             name_file=episode_number+" "+finish_name+".mp4"
             try:
                 stan=down(episode_number, name_file, path, url)
-            except OSError as exc:
+            except OSError:
                 print('OS ERROR')	
     except KeyboardInterrupt:
         if trow:

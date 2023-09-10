@@ -1,6 +1,3 @@
-from math import trunc
-from os import name
-from typing import Counter
 import subprocess
 
 print('start program')
@@ -14,7 +11,7 @@ try:
     from libery  import * #мій модуль з додатковивми фунуціями
     import traceback  #інформація про помилки
     import update
-except ImportError as e:
+except ImportError:
         print("Помилка імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt'")
         exit()
 def input_v(min:int,maxx:int=None,list=[])->int:
@@ -29,7 +26,7 @@ def input_v(min:int,maxx:int=None,list=[])->int:
             if v<min:
                 print('Введене число менше допустимого')
                 continue
-            if maxx!=None and v>maxx:
+            if maxx is not None and v>maxx:
                 print('Введене число більше допустимого')
                 continue
         except ValueError:
@@ -119,7 +116,7 @@ def download_wget(listt,name,path="",trow=False):
             if(name.find(i)!=-1):
                 name=name.replace(i, '')
         finish_name=""
-        if cfg.settings['addName']==True:
+        if cfg.settings['addName'] is True:
             finish_name=name
 
         
@@ -147,7 +144,7 @@ def download_wget(listt,name,path="",trow=False):
                 final_path=os.path.join(path,name_file)
                 print(name_file)
                 statis_code=subprocess.call(('wget',"-ct","0","-q","--show-progress" ,"-O",final_path,url))
-            except OSError as exc:
+            except OSError:
                 print('OS ERROR')
         if statis_code==0:	
             isGood=True
@@ -184,7 +181,7 @@ def menu_taytl(taytl_var: taytl):
                 print('Це Анонс,серій ще немає')
                 continue
             list_down=choice_episod(taytl_var)
-            if list_down==None:
+            if list_down is None:
                 return
             print('\n[1/Enter] - завантажити [2]-завантажити через wget [3]-добавити в плейліст [0]-назад > ',end='')
             v=input_v(0,3,[''])
@@ -202,7 +199,7 @@ def menu_taytl(taytl_var: taytl):
             else:
                 print('IT`s BUG !!!')
         elif v==2:
-            if cfg.my_wl==None:
+            if cfg.my_wl is None:
                 print('Відсутній список ваших тайтлів !')
                 n=quesBool('Створити файл зі списком ?')
                 if n:
@@ -244,7 +241,7 @@ def menu_taytl(taytl_var: taytl):
             print('Добавлено')
         elif v==4:
             ll=taytl_var.give_all_taytl()
-            if ll==None:
+            if ll is None:
                 print('Немає інших сезонів')
                 continue
             print_taytl(ll)
@@ -324,7 +321,7 @@ def main():
         v=input_v(0,7)
         if v==1:
             list=giv_end_list_taytls(main_url)
-            if list==None:
+            if list is None:
                 continue  
             print_taytl(list,max=k_ser)  
             flag=True       
@@ -358,7 +355,7 @@ def main():
                         break
                 search=give_search_list(req,full,True)
                 full=False
-                if search==False:
+                if search is False:
                     print('Нічого ненайдено')
                 else:
                     print_taytl(search)  
@@ -379,7 +376,7 @@ def main():
                         menu_taytl(taytl_var)
                         break                
         elif v==4:     
-            if cfg.my_wl==None:
+            if cfg.my_wl is None:
                 print('Відсутній список ваших тайтлів !')
                 n=quesBool('Створити файл зі списком ?')
                 if n:
@@ -476,7 +473,7 @@ def main():
                                 write_mylist()
                                 print(f'Видалено:\n- {name}\n')
                     elif v==2:
-                        if cfg.my_wl==None:
+                        if cfg.my_wl is None:
                             print('Відсутній список ваших тайтлів !')
                             n=quesBool('Створити файл зі списком ?')
                             if n:
@@ -557,7 +554,7 @@ def main():
                     var=zagal[n-1]
                     menu_taytl(taytl(var.url))                
         elif v==7:
-            print(f"\n[1] - Історія [2] - Переглянуті [3] - Налаштування(NONE) [0] - Назад > ",end="")
+            print("\n[1] - Історія [2] - Переглянуті [3] - Налаштування(NONE) [0] - Назад > ",end="")
             v=input_v(0,3)
             if v==1:
                 hl=give_history()
@@ -616,7 +613,7 @@ if __name__ == '__main__':
                 print('\nПрограму оновлено, запустіть її щераз')
                 exit()
         ex_cod=main()
-    except ImportError as e:
+    except ImportError:
         print(' ')
         print("Помилка імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt' якщо не допоможt то примусовов обновіть файли 'python update.py'")
     except requests.ConnectionError as e:

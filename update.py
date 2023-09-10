@@ -26,7 +26,7 @@ def isactual()->bool:
         i2=data.find("'",i1)
         global_ver=data[i1:i2]        
         return ver==global_ver
-    except requests.ConnectionError as e:
+    except requests.ConnectionError:
         print('Не вдалось провірити актуальність програми')
         print('МОЖЛИВО У ВАС ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ')
         return True

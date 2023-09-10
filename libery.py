@@ -105,10 +105,10 @@ class taytl(taytl_base):
         self.list_dop_ep=dop  
 
     def give_all_taytl(self):
-        if self.all_taytl!=None:
+        if self.all_taytl is not None:
             return self.all_taytl
         item=self.soup.find('ol')
-        if item==None:
+        if item is None:
             return None
         item=item.find_all('li')
         s=[]
@@ -124,7 +124,7 @@ class taytl(taytl_base):
     def __init__(self, url, name=None,kl_ep=0,list_ep=None,list_dop_ep=None,soup=None,r=None):
         
         super().__init__(url,name)
-        if r==None:
+        if r is None:
             # print(url)
             r = requests.get(url)
         if r.status_code!=200:
@@ -132,9 +132,9 @@ class taytl(taytl_base):
         soup=BeautifulSoup(r.content, 'html.parser')
         self.kl_dop_ep=0
         self.all_taytl=None
-        if list_ep==None:
+        if list_ep is None:
             self.list_ep=None
-        if list_dop_ep==None:
+        if list_dop_ep is None:
             self.list_dop_ep=None
         if kl_ep==0:
             self.kl_ep=0
@@ -162,7 +162,7 @@ def giv_end_taytls(url):# вертає html з даними про остані 
     
 def giv_end_list_taytls(url):#вертає список обєктів taytl
     el=giv_end_taytls(url)
-    if el==None:
+    if el is None:
         return None
     s=[]
     for i in el:
@@ -221,7 +221,6 @@ def parse_results(response):#search def
     css_identifier_result = ".tF2Cxc"
     css_identifier_title = "h3"
     css_identifier_link = ".yuRUbf a"
-    css_identifier_text = ".IsZvec"
     
     results = response.html.find(css_identifier_result)
 
@@ -255,7 +254,7 @@ def get_script_dir(follow_symlinks=True):
 
 def print_taytl(list,min=0,max=None):
     print()
-    if max==None:
+    if max is None:
         max=len(list)
     for i in range(0,len(list)):
         if(i<max):
@@ -290,7 +289,7 @@ def is_taytl(url):
         
 
 def give_taytl_whits_page(url,r=None):
-    if r==None:
+    if r is None:
         r=requests.get(url)
     if r.status_code!=200:
         return None
@@ -352,7 +351,7 @@ def give_search_list(req,all=False,stat_bar=False):
         for i in vd:            
             if is_taytl(clear_url(i['link'])):
                 all_list.append(taytl(clear_url(i['link'])))
-    if all_list==[] and all==False:
+    if all_list==[] and all is False:
         if stat_bar:
             print('Активація додаткового пошуку...')
         all_list= give_search_list(req,True,stat_bar)
@@ -375,11 +374,11 @@ def read_mylist():
         with open(my_wl_name, "r") as jsonfile:
             data = json.load(jsonfile) # Reading the file
             return data
-    except KeyError as e:  
+    except KeyError:  
         print(f'Файл {my_wl_name} з списком ваших тайтлів пошкоджений')  
-    except json.decoder.JSONDecodeError as e:
+    except json.decoder.JSONDecodeError:
         print(f'Файл {my_wl_name} з списком ваших тайтлів пошкоджений')
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         print(f'Файл {my_wl_name} з списком ваших тайтлів не знайдено')
 
 def print_my_list(my_list,my_def,start=1):
@@ -473,30 +472,30 @@ def give_my_taytl():
     return cfg.wl,future_titles
 
 def give_history():
-    if cfg.history==None:
+    if cfg.history is None:
         try:
             with open(history_file_name, "r") as jsonfile:
                 cfg.history = json.load(jsonfile) # Reading the file
-        except KeyError as e:  
+        except KeyError:  
             print(f'Файл {history_file_name} з історією пошкоджений')  
-        except json.decoder.JSONDecodeError as e:
+        except json.decoder.JSONDecodeError:
             print(f'Файл {history_file_name} з історією пошкоджений')
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             cfg.history=[]
             with open(history_file_name, "w") as jsonfile:
                 json.dump(cfg.history, jsonfile)
     return cfg.history
 
 def give_viewed_list():
-    if cfg.viewed==None:
+    if cfg.viewed is None:
         try:
             with open(viewed_file_name, "r") as jsonfile:
                 cfg.viewed = json.load(jsonfile) # Reading the file
-        except KeyError as e:  
+        except KeyError:  
             print(f'Файл {viewed_file_name} з переглянутими тайтлами пошкоджений')  
-        except json.decoder.JSONDecodeError as e:
+        except json.decoder.JSONDecodeError:
             print(f'Файл {viewed_file_name} з переглянутими тайтлами пошкоджений')  
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             cfg.viewed=[]
             with open(viewed_file_name, "w") as jsonfile:
                 json.dump(cfg.viewed, jsonfile)
