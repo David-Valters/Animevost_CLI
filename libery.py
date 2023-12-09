@@ -11,7 +11,7 @@ try:
     import json
     import datetime
     from bs4 import BeautifulSoup # парсинг сторіки
-    from requests_html import HTMLSession #для пошуку
+    from duckduckgo_search import DDGS #для пошуку
 except ImportError as e:
     print(f"Помилка імпорту {e}")
 
@@ -209,39 +209,10 @@ def get_source(url):#search def
     except requests.exceptions.RequestException as e:
         print(e)
 
-def get_results(query):#search def
-    url=f"https://www.google.com/search?&q=site%3A{main_url}+" + query
-    # print('url: ',url)
-    response = get_source(url)
-    
-    return response
-
-def parse_results(response):#search def
-    
-    css_identifier_result = ".tF2Cxc"
-    css_identifier_title = "h3"
-    css_identifier_link = ".yuRUbf a"
-    
-    results = response.html.find(css_identifier_result)
-
-    output = []
-    
-    for result in results:
-
-        item = {
-            'title': result.find(css_identifier_title, first=True).text,
-            'link': result.find(css_identifier_link, first=True).attrs['href'],
-        }
-        if(len(output)<3):
-            output.append(item)
-        else:
-            break
-        
-    return output
-
-def google_search(query):#search def
-    response = get_results(query)
-    return parse_results(response)
+def duckduckgo_search(query):#search def
+    with DDGS() as ddgs:
+        results = [r for r in ddgs.text(f"site:animevost.org {query}", max_results=10)]
+    return results
 
 def get_script_dir(follow_symlinks=True):
     if getattr(sys, 'frozen', False): # py2exe, PyInstaller, cx_Freeze
@@ -320,7 +291,7 @@ def give_search_list(req,all=False,stat_bar=False):
     print_name=""
     if stat_bar:
         print('Пошук...')
-    vd=google_search(req)
+    vd=duckduckgo_search(req)
     if vd==[]:
         return False
     all_list=[]
@@ -333,7 +304,7 @@ def give_search_list(req,all=False,stat_bar=False):
             if stat_bar:
                 sys.stdout.write(f"\r[%s%s]  {print_name[:60]}... " % ('#' * done, '-' * (50-done)) )	
                 sys.stdout.flush()
-            clean_link=clear_url(clear_url(i['link']))
+            clean_link=clear_url(clear_url(i['href']))
             r=requests.get(clean_link)
             clean_link=r.url
             if is_taytl(clean_link):
@@ -349,8 +320,8 @@ def give_search_list(req,all=False,stat_bar=False):
         return all_list
     else:
         for i in vd:            
-            if is_taytl(clear_url(i['link'])):
-                all_list.append(taytl(clear_url(i['link'])))
+            if is_taytl(clear_url(i['href'])):
+                all_list.append(taytl(clear_url(i['href'])))
     if all_list==[] and all is False:
         if stat_bar:
             print('Активація додаткового пошуку...')
