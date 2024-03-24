@@ -11,5 +11,6 @@ settings={
 wl=[]
 f_wl=[]
 end_taytl=[]
+ids_downloaded_taytls={}
 history=None
 viewed=None

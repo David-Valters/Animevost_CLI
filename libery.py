@@ -20,6 +20,7 @@ main_url='https://animevost.org'
 my_wl_name="my_watch_list.json"
 history_file_name="history_list.json"
 viewed_file_name="viewed_list.json"
+ids_downloaded_taytls_file_name="ids_downloaded_taytls.json"
 class taytl_base:
     def __init__(self,url,name=""):
         self.name=name
@@ -159,7 +160,12 @@ def giv_end_taytls(url):# вертає html з даними про остані 
     items = soup.find('ul',class_='raspis raspis_fixed')
     el=items.findAll('a')
     return el
-    
+
+def get_taytl_id(url):
+    i1=url.rfind('/')
+    i2=url.find('-',i1)
+    return url[i1+1:i2]
+
 def giv_end_list_taytls(url):#вертає список обєктів taytl
     el=giv_end_taytls(url)
     if el is None:
@@ -332,6 +338,35 @@ def give_search_list(req,all=False,stat_bar=False):
 def write_mylist():
     with open(my_wl_name, "w") as jsonfile:
         json.dump(cfg.my_wl, jsonfile) # Writing to the file
+
+def add_id_to_viewed_taytls(id):
+    date = datetime.datetime.today().strftime("%d.%m.%Y")
+    if not date in cfg.ids_downloaded_taytls:
+        cfg.ids_downloaded_taytls[date]=[]
+    cfg.ids_downloaded_taytls[date].append(id)
+
+def write_ids_viewed_taytls():
+    with open(ids_downloaded_taytls_file_name, "w") as jsonfile:
+        json.dump(cfg.ids_downloaded_taytls, jsonfile) # Writing to the file
+
+def read_ids_viewed_taytls():
+    try:
+        with open(ids_downloaded_taytls_file_name, "r") as jsonfile:
+            info = json.load(jsonfile) # Reading the file
+            now_date = datetime.datetime.today().strftime("%d.%m.%Y")
+            for date in info:
+                if date!=now_date:
+                    info.pop(date,None)
+            cfg.ids_downloaded_taytls = info
+    except KeyError:  
+        print(f'Файл {ids_downloaded_taytls_file_name} пошкоджений')  
+    except json.decoder.JSONDecodeError:
+        print(f'Файл {ids_downloaded_taytls_file_name} пошкоджений')
+    except FileNotFoundError:
+        cfg.ids_downloaded_taytls={}
+        with open(ids_downloaded_taytls_file_name, "w") as jsonfile:
+            json.dump(cfg.ids_downloaded_taytls, jsonfile)
+
 def add_taytl_in_wl(wl_taytl):
     cfg.my_wl['list'].append(wl_taytl)
     write_mylist()
@@ -359,6 +394,9 @@ def print_my_list(my_list,my_def,start=1):
         print(f'[{k}]',my_def(i))
         k+=1
     print()
+
+def strike(text):
+    return ''.join([u'\u0336{}'.format(c) for c in text])
 
 def give_raspis():
     r=requests.get(main_url)
@@ -501,6 +539,11 @@ def add_in_viewed_list(taytl_var):
     cfg.viewed.insert(0, tat)
     with open(viewed_file_name, "w") as jsonfile:
         json.dump(cfg.viewed, jsonfile)
+
+
+def is_taytl_downloaded(taytl:taytl_base)->bool:
+    date = datetime.datetime.today().strftime("%d.%m.%Y")
+    return get_taytl_id(taytl.url) in cfg.ids_downloaded_taytls.get(date,[])
 
 def test():
     pass

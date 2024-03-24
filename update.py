@@ -3,7 +3,7 @@ import os
 
 import libery
 
-ver='v1.6.1'
+ver='v1.7.0'
 url_ver='https://raw.githubusercontent.com/David-Valters/Animevost_CLI/main/update.py'
 url_file_list='https://api.github.com/repos/David-Valters/Animevost_CLI/git/trees/main?recursive=1'
 

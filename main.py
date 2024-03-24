@@ -315,6 +315,7 @@ def main():
     k_ser=6
     # global my_wl
     cfg.my_wl= read_mylist()
+    read_ids_viewed_taytls()
     #-- 
     while 1:
         print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Додатково\n[0]-Вийти\n> ',end='')
@@ -399,7 +400,7 @@ def main():
             if len(cfg.f_wl)==0:
                 print('\nСьогодні нових серій не буде :(')
             else:
-                print_my_list(cfg.f_wl,lambda x:x.name)
+                print_my_list(cfg.f_wl,lambda x:strike(x.name) if is_taytl_downloaded(x) else x.name)
             while True:
                 if fll:
                     print('\n[1/Enter] - Завантажити\n[2] - Завантажити через wget\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
@@ -429,6 +430,8 @@ def main():
                             cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
                             cfg.wl.remove(j)
                             write_mylist()
+                            add_id_to_viewed_taytls(get_taytl_id(j['url']))
+                            write_ids_viewed_taytls()
                         break
                     except KeyboardInterrupt:
                         print("\nЗавантаження перервано")
@@ -450,6 +453,8 @@ def main():
                         cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
                         cfg.wl.remove(j)
                         write_mylist()
+                        add_id_to_viewed_taytls(get_taytl_id(j['url']))
+                        write_ids_viewed_taytls()
                     break
                 elif v==3:
                     print('\n[1] - Видалити по номеру\n[2] - Видалити тайтли які вже завершились\n[3] - Змінити номер останньої серії\n[0] - Назад\n> ',end='')
