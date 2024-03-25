@@ -3,7 +3,7 @@ import os
 
 import libery
 
-ver='v1.7.0'
+ver='v1.7.1'
 url_ver='https://raw.githubusercontent.com/David-Valters/Animevost_CLI/main/update.py'
 url_file_list='https://api.github.com/repos/David-Valters/Animevost_CLI/git/trees/main?recursive=1'
 
@@ -25,7 +25,7 @@ def isactual()->bool:
         i1+=+len(f1)
         i2=data.find("'",i1)
         global_ver=data[i1:i2]        
-        return ver==global_ver
+        return ver>=global_ver
     except requests.ConnectionError:
         print('Не вдалось провірити актуальність програми')
         print('МОЖЛИВО У ВАС ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ')

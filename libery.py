@@ -341,7 +341,7 @@ def write_mylist():
 
 def add_id_to_viewed_taytls(id):
     date = datetime.datetime.today().strftime("%d.%m.%Y")
-    if not date in cfg.ids_downloaded_taytls:
+    if date not in cfg.ids_downloaded_taytls:
         cfg.ids_downloaded_taytls[date]=[]
     cfg.ids_downloaded_taytls[date].append(id)
 
@@ -354,10 +354,11 @@ def read_ids_viewed_taytls():
         with open(ids_downloaded_taytls_file_name, "r") as jsonfile:
             info = json.load(jsonfile) # Reading the file
             now_date = datetime.datetime.today().strftime("%d.%m.%Y")
-            for date in info:
+            for date in list(info):
                 if date!=now_date:
                     info.pop(date,None)
             cfg.ids_downloaded_taytls = info
+        write_ids_viewed_taytls()
     except KeyError:  
         print(f'Файл {ids_downloaded_taytls_file_name} пошкоджений')  
     except json.decoder.JSONDecodeError:
