@@ -445,6 +445,9 @@ def main():
                         add_in_history(taytl_var, j['ep'])
                         taytl_var.set_list_episod()          
                         zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
+                        if j['ep']+1 > len(zahal_ep):
+                            print(f"\Остання серія ще не доступна ({j['name']})")
+                            continue
                         lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
                         # isGood=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
                         isGood=download_wget(lll, taytl_var.give_short_name(), name_folder,True)
