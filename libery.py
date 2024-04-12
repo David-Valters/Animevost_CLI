@@ -388,6 +388,15 @@ def read_mylist():
     except FileNotFoundError:
         print(f'Файл {my_wl_name} з списком ваших тайтлів не знайдено')
 
+def will_be_downloaded_taytl(t:taytl_base)->bool:
+    wanted_id = get_taytl_id(t.url)    
+    for i in cfg.wl:
+        current_id = get_taytl_id(i["url"])
+        if current_id == wanted_id:
+            return True
+
+    return False
+
 def print_my_list(my_list,my_def,start=1):
     k=start
     print()

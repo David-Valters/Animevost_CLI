@@ -400,7 +400,9 @@ def main():
             if len(cfg.f_wl)==0:
                 print('\nСьогодні нових серій не буде :(')
             else:
-                print_my_list(cfg.f_wl,lambda x:strike(x.name) if is_taytl_downloaded(x) else x.name)
+                print_my_list(cfg.f_wl,lambda x:strike(x.name) 
+                    if is_taytl_downloaded(x) or will_be_downloaded_taytl(x) 
+                    else x.name)
             while True:
                 if fll:
                     print('\n[1/Enter] - Завантажити\n[2] - Завантажити через wget\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
