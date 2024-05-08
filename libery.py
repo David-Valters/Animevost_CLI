@@ -478,13 +478,13 @@ def give_my_taytl():
                 if fl:
                     cfg.wl.append(cop)
             index+=1            
-        for g in raspis:
-            for c in cfg.my_wl['list']:
-                www=g.give_short_name()
-                if www==c['name']:
-                    future_titles.append(g)
-                    break
-        cfg.f_wl=future_titles
+    for g in raspis:
+        for c in cfg.my_wl['list']:
+            www=g.give_short_name()
+            if www==c['name']:
+                future_titles.append(g)
+                break
+    cfg.f_wl=future_titles
     print()
     print()
     cfg.end_taytl=l 
