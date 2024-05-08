@@ -317,9 +317,15 @@ def main():
     cfg.my_wl= read_mylist()
     read_ids_viewed_taytls()
     #-- 
+    default_input=None
     while 1:
-        print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Додатково\n[0]-Вийти\n> ',end='')
-        v=input_v(0,7)
+        if default_input == None:
+            print('\n[1]-Останні тайтли на сайті\n[2]-Посилання на тайтл\n[3]-Пошук\n[4]-Мої тайтли\n[5]-Плейліст\n[6]-Розклад\n[7]-Додатково\n[0]-Вийти\n> ',end='')
+            v=input_v(0,7)
+        else:
+            v=default_input
+            default_input=None
+
         if v==1:
             list=giv_end_list_taytls(main_url)
             if list is None:
@@ -405,13 +411,13 @@ def main():
                     else x.name)
             while True:
                 if fll:
-                    print('\n[1/Enter] - Завантажити\n[2] - Завантажити через wget\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
+                    print('\n[1/Enter] - Завантажити\n[2] - Завантажити через wget\n[3] - Редагувати список моїх тайтлів\n[4] - Оновити\n[0] - Головне меню\n> ',end='')
                 else:
-                    print('\n[3] - Редагувати список моїх тайтлів\n[0] - Головне меню\n> ',end='')
+                    print('\n[3] - Редагувати список моїх тайтлів\n[4] - Оновити\n[0] - Головне меню\n> ',end='')
                 if fll:
-                    v=input_v(0,3,[''])
+                    v=input_v(0,4,[''])
                 else:
-                    v=input_v(3,3,['0'])
+                    v=input_v(3,4,['0'])
                 if v==0 or v=='0':
                     break
                 elif v==1 or v=='':
@@ -543,6 +549,9 @@ def main():
                             else:
                                 edit_num_ep(v-1)   
                             cfg.end_taytl=[]                    
+                elif v==4:
+                    default_input=4
+                    break
         elif v==5:
             playlist_def()
         elif v==6:
