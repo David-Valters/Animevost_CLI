@@ -53,7 +53,11 @@ class taytl_base:
             return 0
         i1=name.find('-')
         if i1==-1:
-            return 1
+            try:
+                kl=int(name.split()[0])
+            except ValueError:# на випадок якщо не вийде дізнатись кількість серій
+                kl=0
+            return kl
         i2=name.find(' ',i1)
         try:
             kl=int(name[i1+1:i2])
