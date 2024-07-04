@@ -106,7 +106,7 @@ def choice_episod(taytl_var: taytl):
                 print('Не коректне введення!')
 
 def download(list_down,taytl_var:taytl):
-    inst.save_from(list_down,taytl_var.give_short_name())
+    return inst.save_from(list_down,taytl_var.give_short_name())
 
 def download_wget(listt,name,path="",trow=False):
     isGood=False
@@ -267,18 +267,21 @@ def playlist_def():
         print('[1/Enter] - Завантажити [2] - Завантажити через wget [3]- Очистити плейліст [4]-Видалити один елемент [0] - Назад > ',end='')
         v=input_v(0,5,[''])
         if v==''or v==1:
-            for i in playlist:
-                download(i[1],i[0])
-            playlist.clear()
-            break
-        elif v==2:
-            for i in playlist:
-                # download(i[1],i[0])
-                isGood=download_wget(i[1],i[0].give_short_name())
-                pass
+            playlist_copy = playlist[:]
+            for i in playlist_copy:
+                isGood=download(i[1],i[0])
                 if not isGood:
                     continue
-                playlist.pop(0)
+                playlist.remove(i)
+            break
+        elif v==2:
+            playlist_copy = playlist[:]
+            for i in playlist_copy:
+                # download(i[1],i[0])
+                isGood=download_wget(i[1],i[0].give_short_name())
+                if not isGood:
+                    continue
+                playlist.remove(i)
             break
         elif v==3:
             playlist.clear()

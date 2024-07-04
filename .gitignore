@@ -4,3 +4,5 @@ Download/
 Download
 config/
 *.json
+.venv/
+*.sh
