@@ -15,7 +15,7 @@ try:
 except ImportError as e:
     print(f"Помилка імпорту {e}")
 
-main_url='https://v2.vost.pw'
+main_url='https://animevost.org'
 
 my_wl_name="my_watch_list.json"
 history_file_name="history_list.json"
@@ -180,7 +180,7 @@ def giv_end_list_taytls(url):#вертає список обєктів taytl
     return s
 
 def old_make_ep_url(kod:str,quality:int=720)->str:   
-    urls_player=[f"https://v2.vost.pw/frame5.php?play={kod}&player=9",f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
+    urls_player=[f"https://animevost.org/frame5.php?play={kod}&player=9",f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
     while True:
         r= requests.get(urls_player[cfg.nom_payer])
         if r.status_code!=200:
