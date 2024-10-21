@@ -12,6 +12,8 @@ try:
     import datetime
     from bs4 import BeautifulSoup # парсинг сторіки
     from duckduckgo_search import DDGS #для пошуку
+
+    from urllib.parse import urlparse, urlunparse
 except ImportError as e:
     print(f"Помилка імпорту {e}")
 
@@ -384,6 +386,13 @@ def read_mylist():
     try:
         with open(my_wl_name, "r") as jsonfile:
             data = json.load(jsonfile) # Reading the file
+            parsed_main_url = urlparse(main_url)
+            for i in data['list']:
+                parsed_url = urlparse(i['url'])
+                if parsed_url.netloc != parsed_main_url.netloc:
+                    new_url = urlunparse((parsed_main_url.scheme, parsed_main_url.netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment))
+                    i['url']=new_url
+
             return data
     except KeyError:  
         print(f'Файл {my_wl_name} з списком ваших тайтлів пошкоджений')  
