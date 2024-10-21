@@ -11,7 +11,7 @@ try:
     import json
     import datetime
     from bs4 import BeautifulSoup # парсинг сторіки
-    from duckduckgo_search import DDGS #для пошуку
+    # from duckduckgo_search import DDGS #для пошуку
 
     from urllib.parse import urlparse, urlunparse
 except ImportError as e:
@@ -221,10 +221,26 @@ def get_source(url):#search def
     except requests.exceptions.RequestException as e:
         print(e)
 
-def duckduckgo_search(query):#search def
-    with DDGS() as ddgs:
-        results = [r for r in ddgs.text(f"site:animevost.org {query}", max_results=10)]
+# def duckduckgo_search(query):#search def
+#     with DDGS() as ddgs:
+#         results = [r for r in ddgs.text(f"site:animevost.org {query}", max_results=10)]
+#     return results
+
+def site_search(query)->list: #TODO this ['href':'value']
+    results = []
+    url = f"{main_url}/index.php?do=search"
+    data = {'do':'search','subaction':'search','story':query}
+    r = requests.post(url, data=data)
+    if r.status_code!=200:
+        print("Error conect to site(search): "+str(r.status_code))
+        return results
+    soup=BeautifulSoup(r.content, 'html.parser')
+    items = soup.find_all('div',class_='shortstory')
+    for i in items:
+        a=i.find('a')
+        results.append({'href':a['href'],'text':a.text})
     return results
+
 
 def get_script_dir(follow_symlinks=True):
     if getattr(sys, 'frozen', False): # py2exe, PyInstaller, cx_Freeze
@@ -303,7 +319,8 @@ def give_search_list(req,all=False,stat_bar=False):
     print_name=""
     if stat_bar:
         print('Пошук...')
-    vd=duckduckgo_search(req)
+    # vd=duckduckgo_search(req)
+    vd=site_search(req)
     if vd==[]:
         return False
     all_list=[]
