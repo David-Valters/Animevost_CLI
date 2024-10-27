@@ -510,8 +510,8 @@ def give_my_taytl():
             index+=1            
     for g in raspis:
         for c in cfg.my_wl['list']:
-            www=g.give_short_name()
-            if www==c['name']:
+            g_id = get_taytl_id(g.url)
+            if g_id==get_taytl_id(c['url']):
                 future_titles.append(g)
                 break
     cfg.f_wl=future_titles
