@@ -14,15 +14,15 @@ try:
 except ImportError:
         print("Помилка імпорту бібліотеки,введіть 'python -m pip install -r requirements.txt'")
         exit()
-def input_v(min:int,maxx:int=None,list=[])->int:
+def input_v(min:int,maxx:int|None=None,list=[])->int:
     while True:
         try:
-            v=input()
+            vs=input()
             if list!=[]:
                 for i in list:
-                    if i==v:
+                    if i==vs:
                         return i
-            v=int(v)
+            v=int(vs)
             if v<min:
                 print('Введене число менше допустимого')
                 continue
@@ -208,10 +208,10 @@ def menu_taytl(taytl_var: taytl):
                     return None
             name=taytl_var.give_short_name()
             
-            size_my_wl=len(cfg.my_wl['list'])
+            size_my_wl=len(cfg.my_wl['list']) # type: ignore
             flag=False
             for i in range(size_my_wl):
-                if cfg.my_wl['list'][i]['name']==name:
+                if cfg.my_wl['list'][i]['name']==name: # type: ignore
                     print('Цей тайтл вже є в вашому списку "мої тайтли"\n')
                     flag=True
             if flag:
@@ -621,7 +621,7 @@ if __name__ == '__main__':
         #global nom_player
         
         global playlist
-        playlist=[]
+        playlist:list=[]
 
         ex_cod=1
         #TOD upda

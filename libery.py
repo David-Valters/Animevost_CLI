@@ -181,7 +181,7 @@ def giv_end_list_taytls(url):#вертає список обєктів taytl
         s.append(taytl_base(i['href'],i.text))
     return s
 
-def old_make_ep_url(kod:str,quality:int=720)->str:   
+def old_make_ep_url(kod:str,quality:int=720)->str | None:   
     urls_player=[f"https://animevost.org/frame5.php?play={kod}&player=9",f"http://play.agorov.org/{kod}?old=1",f"http://play.animegost.org/{kod}?player=9"]
     while True:
         r= requests.get(urls_player[cfg.nom_payer])
@@ -206,7 +206,7 @@ def old_make_ep_url(kod:str,quality:int=720)->str:
         print('Немає такої якості')
         return None
 
-def make_ep_url(kod:str,quality:int=720)->str:       
+def make_ep_url(kod:str,quality:int=720)->str|None:       
     if cfg.settings['NoAPIDownload']:
         return old_make_ep_url(kod,quality)
         
@@ -227,7 +227,7 @@ def get_source(url):#search def
 #     return results
 
 def site_search(query)->list: #TODO this ['href':'value']
-    results = []
+    results: list[dict[str, str]] = []
     url = f"{main_url}/index.php?do=search"
     data = {'do':'search','subaction':'search','story':query}
     r = requests.post(url, data=data)
