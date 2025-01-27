@@ -459,6 +459,9 @@ def main():
                         if j['ep']+1 > len(zahal_ep):
                             print(f"\Остання серія ще не доступна ({j['name']})")
                             continue
+                        if j['ep']+j['+'] > len(zahal_ep):
+                            print("Кількість серій у назві не відповідає, кількості доступних серій. Спробую завантажити лише доступні.")
+                            j['+']=len(zahal_ep)-j['ep']
                         lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
                         # isGood=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
                         isGood=download_wget(lll, taytl_var.give_short_name(), name_folder,True)
