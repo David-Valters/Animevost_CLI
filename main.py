@@ -183,8 +183,8 @@ def menu_taytl(taytl_var: taytl):
             list_down=choice_episod(taytl_var)
             if list_down is None:
                 return
-            print('\n[1/Enter] - завантажити [2]-завантажити через wget [3]-добавити в плейліст [0]-назад > ',end='')
-            v=input_v(0,3,[''])
+            print('\n[1/Enter] - завантажити [2]-завантажити через wget [3]-добавити в плейліст [4]-відкрити у mpv [0]-назад > ',end='')
+            v=input_v(0,4,[''])
             if v==''or v==1:
                 download(list_down,taytl_var)
                 break
@@ -194,6 +194,12 @@ def menu_taytl(taytl_var: taytl):
             elif v==3:
                 playlist.append([taytl_var,list_down])
                 break
+            elif v==4:
+                for i in list_down:
+                    status_code=subprocess.call(('mpv',i[1]))
+                    if status_code!=0:
+                        print(f"Помилка mpv: {status_code}")
+                # break
             elif v==0:
                 continue
             else:
