@@ -427,12 +427,13 @@ def will_be_downloaded_taytl(t:taytl_base)->bool:
 
     return False
 
-def print_my_list(my_list,my_def,start=1):
-    k=start
+def print_my_list(my_list,my_def,start=1, reverse=False):
+    ll = enumerate(my_list)
+    if reverse:
+        ll = reversed(list(enumerate(my_list)))
     print()
-    for i in my_list:
-        print(f'[{k}]',my_def(i))
-        k+=1
+    for c, i in ll:
+        print(f'[{c+start}]',my_def(i))
     print()
 
 def strike(text):

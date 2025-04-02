@@ -590,7 +590,7 @@ def main():
             if v==1:
                 hl=give_history()
                 if len(hl)>0:
-                    print_my_list(hl,lambda x:x['name'])
+                    print_my_list(hl,lambda x:x['name'], reverse=True)
                     print(f'Ведіть номер тайтла [1-{len(cfg.history)}] або [0] - Назад > ',end="")
                     n=input_v(0,len(cfg.history))
                     if n!=0:
