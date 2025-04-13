@@ -11,18 +11,10 @@ def get_str_size(s):
     return len(s.encode('utf-8'))
 
 def get_shortened_name(name,max_size):
-    P=name.rfind('(')
-    if (P!=-1 and  name.find(')')!=-1):
-        dop_len=get_str_size(name[P:])
-        p=P
-        while (get_str_size(name[:p])>max_size-dop_len-2):
-            p-=2
-        return name[:p]+"..."+name[P:]
-    else:
-        pos=len(name)
-        while(get_str_size(name[:pos])>max_size):
-            pos-=2
-        return name[:pos]+'...'
+    pos=len(name)
+    while(get_str_size(name[:pos])>max_size):
+        pos-=2
+    return name[:pos]+'...'
 
 def convert_size(size_bytes,write_type=1):
    if size_bytes == 0:
