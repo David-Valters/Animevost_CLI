@@ -17,7 +17,7 @@ except ImportError:
 def input_v(min:int,maxx:int|None=None,list=[])->int:
     while True:
         try:
-            vs=input()
+            vs=input().strip()
             if list!=[]:
                 for i in list:
                     if i==vs:

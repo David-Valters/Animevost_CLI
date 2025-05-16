@@ -1,0 +1,13 @@
+[project]
+name = "animevost-cli"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "beautifulsoup4>=4.10.0",
+    "requests>=2.32.3",
+]
+
+[tool.uv.workspace]
+members = [".venv/lib/python3.12"]
