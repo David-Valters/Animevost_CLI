@@ -377,8 +377,9 @@ def read_ids_viewed_taytls():
         with open(ids_downloaded_taytls_file_name, "r") as jsonfile:
             info = json.load(jsonfile) # Reading the file
             now_date = datetime.datetime.today().strftime("%d.%m.%Y")
+            yesterday_date = (datetime.datetime.today() - datetime.timedelta(days=1)).strftime("%d.%m.%Y")
             for date in list(info):
-                if date!=now_date:
+                if date!=now_date and date!=yesterday_date:
                     info.pop(date,None)
             cfg.ids_downloaded_taytls = info
         write_ids_viewed_taytls()
@@ -583,8 +584,10 @@ def add_in_viewed_list(taytl_var):
 
 
 def is_taytl_downloaded(taytl:taytl_base)->bool:
-    date = datetime.datetime.today().strftime("%d.%m.%Y")
-    return get_taytl_id(taytl.url) in cfg.ids_downloaded_taytls.get(date,[])
+    now_date = datetime.datetime.today().strftime("%d.%m.%Y")
+    yesterday_date = (datetime.datetime.today() - datetime.timedelta(days=1)).strftime("%d.%m.%Y")
+    taytl_id = get_taytl_id(taytl.url)
+    return taytl_id in cfg.ids_downloaded_taytls.get(now_date,[]) or taytl_id in cfg.ids_downloaded_taytls.get(yesterday_date,[])
 
 def test():
     pass
