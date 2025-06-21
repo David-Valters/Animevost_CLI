@@ -108,16 +108,28 @@ def choice_episod(taytl_var: taytl):
 def download(list_down,taytl_var:taytl):
     return inst.save_from(list_down,taytl_var.give_short_name())
 
-def download_wget(listt,name,path="",trow=False):
+def get_episod_number(episode_name: str) -> int|None:
+    i1 = episode_name.find(' ')
+    if i1 == -1:        
+        return None    
+    try:
+        episode_number = int(episode_name[:i1])
+        if episode_number < 1:
+            return None
+        return episode_number
+    except ValueError:
+        return None 
+
+def download_wget(listt,name,path="",trow=False, num_last_ep=None):
     isGood=False
     try:
         name=name.replace('\n', '')
         for i in inst.lb:
             if(name.find(i)!=-1):
                 name=name.replace(i, '')
-        finish_name=""
+        addition_taytl_name=""
         if cfg.settings['addName'] is True:
-            finish_name=name
+            addition_taytl_name=name
 
         
         if (inst.get_str_size(name)<=inst.MAX_NAME_SIZE):
@@ -134,12 +146,19 @@ def download_wget(listt,name,path="",trow=False):
         if not os.path.exists(path):
             os.makedirs(path)
             
-        if (inst.get_str_size(finish_name)>inst.MAX_NAME_SIZE-4):
-            finish_name=inst.get_shortened_name(finish_name, inst.MAX_NAME_SIZE-5-inst.get_str_size(listt[-1][0]))            
         for l in listt:
             url=l[1]
-            episode_number=l[0]                     
-            name_file=episode_number+" "+finish_name+".mp4"
+            episode_name=l[0]
+            if num_last_ep is not None:                
+                episode_number = get_episod_number(episode_name)
+                if episode_number is not None and episode_number == num_last_ep:
+                    episode_name = episode_name + ' [End]'
+
+            finish_name = episode_name + ' ' + addition_taytl_name
+            if (inst.get_str_size(finish_name)>inst.MAX_NAME_SIZE-4):
+                finish_name=inst.get_shortened_name(finish_name, inst.MAX_NAME_SIZE-5-inst.get_str_size(listt[-1][0]))            
+        
+            name_file = finish_name+".mp4"
             try:
                 final_path=os.path.join(path,name_file)
                 print(name_file)
@@ -470,7 +489,7 @@ def main():
                             j['+']=len(zahal_ep)-j['ep']
                         lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
                         # isGood=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
-                        isGood=download_wget(lll, taytl_var.give_short_name(), name_folder,True)
+                        isGood=download_wget(lll, taytl_var.give_short_name(), name_folder,True, num_last_ep=taytl_var.giv_end_kl_ep())
                         if not isGood:
                             continue
                         cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
