@@ -1,3 +1,4 @@
+from datetime import date
 import requests
 import os
 
@@ -17,8 +18,18 @@ def give_list_file():
     return list
 
 def isactual()->bool:
+    date_last_update_check=libery.read_last_update_check()
+    today = date.today()
+    if date_last_update_check == today.isoformat():
+        return True
+
     try:
+        print('Перевірка актуальності програми...')
         r=requests.get(url_ver, headers={'User-Agent': ''})
+        if r.status_code != 200:
+            print('Не вдалось отримати дані з GitHub')
+            return True
+        libery.save_last_update_check()  # save date last update check
         data=r.text
         f1="ver='"
         i1=data.find(f1)

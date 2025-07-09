@@ -1,3 +1,6 @@
+from datetime import date
+
+
 try:
     import os
     import sys
@@ -23,6 +26,8 @@ my_wl_name="my_watch_list.json"
 history_file_name="history_list.json"
 viewed_file_name="viewed_list.json"
 ids_downloaded_taytls_file_name="ids_downloaded_taytls.json"
+date_last_update_check_file_name="date_last_update_check.json"
+
 class taytl_base:
     def __init__(self,url,name=""):
         self.name=name
@@ -588,6 +593,24 @@ def is_taytl_downloaded(taytl:taytl_base)->bool:
     yesterday_date = (datetime.datetime.today() - datetime.timedelta(days=1)).strftime("%d.%m.%Y")
     taytl_id = get_taytl_id(taytl.url)
     return taytl_id in cfg.ids_downloaded_taytls.get(now_date,[]) or taytl_id in cfg.ids_downloaded_taytls.get(yesterday_date,[])
+
+#save date last update check in json 
+def save_last_update_check():
+    now_date = date.today().isoformat()
+    with open(date_last_update_check_file_name, "w") as jsonfile:
+        json.dump({"date": now_date}, jsonfile) # Writing to the file
+
+def read_last_update_check():
+    try:
+        with open(date_last_update_check_file_name, "r") as jsonfile:
+            data = json.load(jsonfile) # Reading the file
+            return data.get("date", None)
+    except KeyError:  
+        print(f'Файл {date_last_update_check_file_name} пошкоджений')  
+    except json.decoder.JSONDecodeError:
+        print(f'Файл {date_last_update_check_file_name} пошкоджений')
+    except FileNotFoundError:
+        return None
 
 def test():
     pass
