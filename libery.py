@@ -50,7 +50,12 @@ class taytl_base:
                     i1-=1                               
                 return self.name[:i1]
             else:
-                return self.name[:self.name.find('/')][:-1]
+                df = self.name.find('/')
+                if df != -1:
+                    return self.name[:df][:-1]
+                else:
+                    ld = self.name.find(' [')
+                    return self.name[:ld] if ld!=-1 else self.name
     def giv_kl_ep(self):
         name=self.name
         i1=name.find('[')
@@ -213,9 +218,10 @@ def old_make_ep_url(kod:str,quality:int=720)->str | None:
 
 def make_ep_url(kod:str,quality:int=720)->str|None:       
     if cfg.settings['NoAPIDownload']:
-        return old_make_ep_url(kod,quality)
+        return old_make_ep_url(kod,quality if quality in [480,720] else 720)
         
-    return f"http://video.animetop.info/{quality}/{kod}.mp4"
+    # return f"http://video.animetop.info/{quality}/{kod}.mp4"
+    return f"https://mini.trn.su/{quality}/{kod}.mp4"
 
 def get_source(url):#search def
     try:

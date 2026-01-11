@@ -68,11 +68,11 @@ def choice_episod(taytl_var: taytl):
                 start=input_v(1,taytl_var.kl_ep)
                 print(f"По яку серію завантажувати({start}-{taytl_var.kl_ep}){spesh_info}? ",end='')
                 end=input_v(start,taytl_var.kl_ep)
-                v_yakist=quesBool("Вибрати серії в якості 720? інакше 480")
+                v_yakist=quesBool("Вибрати серії в якості 1080? інакше 720")
                 if v_yakist:
-                    yak=720
+                    yak=1080
                 else:
-                    yak=480
+                    yak=720
                 zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
 
                 lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],yak)] for i in range(start,end+1)]
@@ -82,18 +82,18 @@ def choice_episod(taytl_var: taytl):
                     ep=taytl_var.list_dop_ep[-1]
                 else:
                     ep=taytl_var.list_ep[-1]
-                v_yakist=quesBool("Вибрати серії в якості 720? інакше 480")
+                v_yakist=quesBool("Вибрати серії в якості 1080? інакше 720")
                 if v_yakist:
-                    dow_url=make_ep_url(ep[1],720)
+                    dow_url=make_ep_url(ep[1],1080)
                 else:
-                    dow_url=make_ep_url(ep[1],480)
+                    dow_url=make_ep_url(ep[1],720)
                 return [[ep[0],dow_url]]  
             elif v==3:
-                v_yakist=quesBool("Вибрати серії в якості 720? інакше 480")
+                v_yakist=quesBool("Вибрати серії в якості 1080? інакше 720")
                 if v_yakist:
-                    yak=720
+                    yak=1080
                 else:
-                    yak=480
+                    yak=720
                 zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
                 lll=[[zahal_ep[i][0],make_ep_url(zahal_ep[i][1],yak)] for i in range(0,taytl_var.kl_ep)]
                 return lll
@@ -145,7 +145,7 @@ def download_wget(listt,name,path="",trow=False, num_last_ep=None):
         
         if not os.path.exists(path):
             os.makedirs(path)
-            
+        statis_code = None   
         for l in listt:
             url=l[1]
             episode_name=l[0]
@@ -163,14 +163,17 @@ def download_wget(listt,name,path="",trow=False, num_last_ep=None):
                 final_path=os.path.join(path,name_file)
                 print(name_file)
                 statis_code=subprocess.call(('wget',"-ct","0","-q","--show-progress" ,"-O",final_path,url))
-            except OSError:
-                print('OS ERROR')
+                if statis_code !=0:
+                    break
+            except OSError as e:
+                print(f'OS ERROR: {e}')
         if statis_code==0:	
             isGood=True
         elif statis_code==8:
             print("Сервер видав відповідь про помилку, cпробуйте встановити параметру NoAPIDownload значення True")
         else:
-            print(f"Помилка wget: {statis_code}")
+            print(f"Помилка wget: {statis_code}\nUrl: {url}")
+        return isGood
     except KeyboardInterrupt:
         if trow:
             raise KeyboardInterrupt
@@ -182,7 +185,8 @@ def download_wget(listt,name,path="",trow=False, num_last_ep=None):
         print('Проблема з посиланням для завантаження')
         print(e)
     finally:
-        return isGood
+        if not trow:
+            return isGood
 
     
     
@@ -459,7 +463,7 @@ def main():
                             add_in_history(taytl_var, j['ep'])
                             taytl_var.set_list_episod()          
                             zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
-                            lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],720)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
+                            lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],1080)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
                             stan=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
                             if not stan:
                                 continue
@@ -476,7 +480,40 @@ def main():
                     name_folder=datetime.datetime.today().strftime("%d.%m.%Y")
                     name_folder=os.path.join(os.getcwd(),"Download","My taytls",name_folder)
                     cop_wl=cfg.wl.copy()
+                    try_list = []
                     for j in cop_wl:
+                        taytl_var=taytl(j['url'])
+                        add_in_history(taytl_var, j['ep'])
+                        taytl_var.set_list_episod()          
+                        zahal_ep=taytl_var.list_ep+taytl_var.list_dop_ep
+                        if j['ep']+1 > len(zahal_ep):
+                            print(f"\Остання серія ще не доступна ({j['name']})")
+                            continue
+                        if j['ep']+j['+'] > len(zahal_ep):
+                            print("Кількість серій у назві не відповідає, кількості доступних серій. Спробую завантажити лише доступні.")
+                            j['+']=len(zahal_ep)-j['ep']
+                        lll=[[zahal_ep[i-1][0],make_ep_url(zahal_ep[i-1][1],1080)] for i in range(j['ep']+1,j['ep']+j['+']+1)]
+                        # isGood=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
+                        try:
+                            isGood=download_wget(lll, taytl_var.give_short_name(), name_folder,True, num_last_ep=taytl_var.giv_end_kl_ep())
+                        except KeyboardInterrupt:
+                            print("\nЗавантаження перервано")
+                            continue
+
+                        if not isGood:
+                            # info about error download
+                            print("==ERROR DOWNLOAD 1080==")
+                            try_list.append(j)
+                            continue
+                        cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
+                        cfg.wl.remove(j)
+                        write_mylist()
+                        add_id_to_viewed_taytls(get_taytl_id(j['url']))
+                        write_ids_viewed_taytls()
+
+                    if len(try_list) > 0:
+                        print("\nСпроба завантажити в якості 720p для невдалих завантажень...")
+                    for j in try_list:
                         taytl_var=taytl(j['url'])
                         add_in_history(taytl_var, j['ep'])
                         taytl_var.set_list_episod()          
@@ -491,6 +528,7 @@ def main():
                         # isGood=inst.save_from(lll,taytl_var.give_short_name(),name_folder,True)
                         isGood=download_wget(lll, taytl_var.give_short_name(), name_folder,True, num_last_ep=taytl_var.giv_end_kl_ep())
                         if not isGood:
+                            print("==ERROR DOWNLOAD==")
                             continue
                         cfg.my_wl['list'][j['n_wl']]['ep']=(j['ep']+j['+'])
                         cfg.wl.remove(j)

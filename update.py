@@ -20,8 +20,12 @@ def give_list_file():
 def isactual()->bool:
     date_last_update_check=libery.read_last_update_check()
     today = date.today()
-    if date_last_update_check == today.isoformat():
-        return True
+    if date_last_update_check:
+        delta=(today - date.fromisoformat(date_last_update_check)).days
+        if delta<7:
+            return True
+    # if date_last_update_check == today.isoformat():
+        # return True
 
     try:
         print('Перевірка актуальності програми...')
