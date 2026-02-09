@@ -6,7 +6,7 @@ settings={
 	'v':v_settings,
 	'addName':True,
 	'allchek':False,
-	'NoAPIDownload':True
+	'NoAPIDownload':False
 }
 wl=[]
 f_wl=[]

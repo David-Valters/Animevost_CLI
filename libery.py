@@ -85,6 +85,9 @@ class taytl_base:
         if ep=='Анонс':
             return 0
         i3=ep.find('из')
+        if i3==-1:
+            ep = ep.replace('серия','').strip()
+            return int(ep)
         kl_ep=ep[i3+3:i2]
         if kl_ep[-1]=='+':
             kl_ep=kl_ep[:-1]
@@ -221,7 +224,8 @@ def make_ep_url(kod:str,quality:int=720)->str|None:
         return old_make_ep_url(kod,quality if quality in [480,720] else 720)
         
     # return f"http://video.animetop.info/{quality}/{kod}.mp4"
-    return f"https://mini.trn.su/{quality}/{kod}.mp4"
+    # return f"https://mini.trn.su/{quality}/{kod}.mp4"
+    return f"https://fhd.trn.su/{quality}/{kod}.mp4"
 
 def get_source(url):#search def
     try:
