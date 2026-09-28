@@ -608,14 +608,17 @@ def main():
                             print('Ці тайтли видалені з "мої татйли" і переміщені в "Переглянуті"')
                     elif v==3:
                         count=len(cfg.my_wl['list'])
+                        new_taytl_names=[i['name'] for i in cfg.wl]
                         while True:
                             print()
-                            print_my_list(cfg.my_wl['list'],lambda i:f"{i['name']} {i['ep']}" )
+                            print_my_list(cfg.my_wl['list'],lambda i:f" {"@" if i['name'] in new_taytl_names else " "} {i['name']} {i['ep']}" )
                             print(f'\nВведіть номер тайтла [1-{count}] щоб змінити серію або [0] - Назад  > ',end='')
                             v=input_v(0,count)
                             if v==0:
                                 break
                             else:
+                                if cfg.my_wl['list'][v-1]['name'] in new_taytl_names:
+                                    new_taytl_names.remove(cfg.my_wl['list'][v-1]['name'])
                                 edit_num_ep(v-1)   
                             cfg.end_taytl=[]                    
                 elif v==4:
